@@ -1,0 +1,25 @@
+{
+  "name": "gwave-beta",
+  "version": "0.0.0",
+  "description": "A web app that enables users to control their Grow Wave Hydroponics units wirelessly.",
+  "scripts": {
+    "start": "webpack-dev-server --progress"
+  },
+  "author": "Loïc Darboux",
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.5",
+    "babel-preset-es2015": "^6.24.1",
+    "css-loader": "^1.0.0",
+    "extract-loader": "^2.0.1",
+    "file-loader": "^1.1.11",
+    "node-sass": "^4.9.3",
+    "sass-loader": "^7.1.0",
+    "webpack": "^3.12.0",
+    "webpack-dev-server": "^2.11.2"
+  },
+  "dependencies": {
+    "@material/button": "^0.38.1",
+    "@material/ripple": "^0.38.1"
+  }
+}
