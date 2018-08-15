@@ -1,0 +1,55 @@
+$mdc-theme-primary: #009688;
+$mdc-theme-on-primary: #282C34;
+$mdc-theme-secondary: #3E4451;
+$mdc-theme-on-secondary: #C8CCD4;
+$mdc-theme-surface: #353C45;
+$mdc-theme-on-surface: #C8CCD4;
+$mdc-theme-background: #282c34;
+$mdc-theme-on-background: #C8CCD4;
+
+@import "@material/button/mdc-button";
+
+/* General Styles */
+
+html, body {
+  font-family: 'Roboto', 'Helvetica', sans-serif;
+  height: 100%;
+}
+
+/* Landing page styles */
+
+#page-landing {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: $mdc-theme-background;
+  background: radial-gradient(circle, $mdc-theme-secondary, $mdc-theme-background);
+  z-index: 10000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  flex-direction: column;
+}
+
+.gw-logo {
+  font-size: 34px;
+  font-family: Amaranth, sans-serif;
+}
+
+.gw-logo img {
+  height: 44px;
+  width: 44px;
+  top: 8px;
+  margin-right: 0px;
+  position: relative;
+}
+
+.gw-caption {
+  margin: 20px 0 40px 0;
+  font-family: 'Amaranth', sans-serif;
+  font-size: 20px;
+  opacity: 0.8;
+}
