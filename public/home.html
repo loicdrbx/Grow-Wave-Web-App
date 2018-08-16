@@ -13,6 +13,8 @@
   <!-- Styling -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,500,300">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Amaranth:700">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css">
   <link rel="stylesheet" href="bundle.css">
 
   <!-- Firebase Configuration -->
@@ -25,9 +27,30 @@
   <script src="bundle.js" async></script>
 </head>
 <body>
-  <h1>Hello World!!!!</h1>
-  <button type="button" class="mdc-button foo-button">
-      Cancel
-  </button>
+  <!-- Top App Bar containing logo, user info, and menu -->
+  <header class="mdc-top-app-bar gw-toolbar">
+    <div class="mdc-top-app-bar__row">
+      <!-- Logo -->
+      <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
+        <h3 class="gw-title">
+          <a href="/home.html">
+            <img src="./images/logo.png" alt="Grow Wave Logo"> 
+            Grow Wave
+          </a>
+        </h3>
+      </section>
+      <!-- Signed-in user info and menu -->
+      <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar">
+        <a class="gw-usernamelink">
+          <div class="gw-avatar"></div>
+          <div class="gw-username"></div>
+        </a>
+        <a href="#" class="material-icons mdc-top-app-bar__action-item" alt="More menu">more_vert
+
+        </a>
+      </section>
+    </div>
+  </header>
+
 </body>
 </html>

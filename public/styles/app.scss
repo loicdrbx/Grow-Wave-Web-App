@@ -7,13 +7,21 @@ $mdc-theme-on-surface: #C8CCD4;
 $mdc-theme-background: #282c34;
 $mdc-theme-on-background: #C8CCD4;
 
+
 @import "@material/button/mdc-button";
+@import "@material/top-app-bar/mdc-top-app-bar";
 
 /* General Styles */
 
 html, body {
   font-family: 'Roboto', 'Helvetica', sans-serif;
   height: 100%;
+  color: $mdc-theme-on-background;
+  background-color: $mdc-theme-background;
+}
+
+.mdc-button {
+  @include mdc-button-ink-color($mdc-theme-on-surface);
 }
 
 /* Landing page styles */
@@ -52,4 +60,63 @@ html, body {
   font-family: 'Amaranth', sans-serif;
   font-size: 20px;
   opacity: 0.8;
+}
+
+/** Home Page Settings */
+
+.gw-toolbar {
+  @include mdc-top-app-bar-ink-color(white);	
+  @include mdc-top-app-bar-fill-color($mdc-theme-surface);
+  @include mdc-top-app-bar-icon-ink-color($mdc-theme-on-surface);
+  @include mdc-elevation(2);	
+}
+
+.gw-title {
+  font-family: 'Amaranth', sans-serif;
+  margin-left: 10px;
+}
+
+.gw-title a {
+  color: white;
+  font-size: 24px;
+  text-decoration: none;
+}
+
+.gw-title img {
+  height: 40px;
+  width: 40px;
+  top: -3px;
+  position: relative;
+  vertical-align: middle;
+}
+
+.gw-usernamelink {
+  padding: 0 10px 0 0;
+  border-radius: 19px 5px 5px 19px;
+  text-transform: none;
+  white-space: nowrap;
+  color: $mdc-theme-on-surface;
+  font-weight: 500;
+}
+
+.gw-avatar {
+  height: 32px;
+  width: 32px;
+  display: inline-block;
+  background-size: 32px 32px;
+  border-radius: 32px;
+  border: 2px white solid;
+  margin-right: 10px;
+
+}
+
+.gw-username {
+  display: inline-block;
+  line-height: 38px;
+  vertical-align: top;
+  width: calc(100% - 46px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
 }
