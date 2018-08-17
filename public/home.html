@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
   <title>Grow Wave</title>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -25,11 +26,13 @@
 
   <!-- Scripts -->
   <script src="bundle.js" async></script>
+
 </head>
 <body>
   <!-- Top App Bar containing logo, user info, and menu -->
-  <header class="mdc-top-app-bar gw-toolbar">
+  <header class="mdc-top-app-bar mdc-top-app-bar--fixed gw-toolbar">
     <div class="mdc-top-app-bar__row">
+
       <!-- Logo -->
       <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
         <h3 class="gw-title">
@@ -39,18 +42,51 @@
           </a>
         </h3>
       </section>
+
       <!-- Signed-in user info and menu -->
       <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar">
         <a class="gw-usernamelink">
           <div class="gw-avatar"></div>
           <div class="gw-username"></div>
         </a>
-        <a href="#" class="material-icons mdc-top-app-bar__action-item" alt="More menu">more_vert
-
+        <a href="#" id="gw-menu" class="material-icons mdc-top-app-bar__action-item" alt="More menu">more_vert
         </a>
       </section>
     </div>
+
+    <!-- Menu for user options -->
+    <!-- TODO: Replace dialog (it's not accessible) with a proper drop down menu-->
+    <aside id="gw-menu-dialog" class="mdc-dialog">
+      <div class="mdc-dialog__surface">
+        <section class="mdc-dialog__body">
+          <ul class="mdc-list">
+            <li id="sign-out" class="mdc-list-item">
+              <i class="material-icons mdc-list-item__graphic">exit_to_app</i>
+              Sign out
+            </li>
+            <li id="delete-account" class="mdc-list-item">
+              <i class="material-icons mdc-list-item__graphic">cancel</i>
+              Delete Account
+            </li>
+            <li role="separator" class="mdc-list-divider"></li>
+            <!-- TODO: Create and add link to About-Help-Contact page  -->
+            <a href="#" class="mdc-list-item mdc-ripple-upgraded">
+              <i class="material-icons mdc-list-item__graphic" alt="About-Help-Contact Page">perm_contact_calendar</i>
+              About-Help-Contact
+            </a>
+          </ul>
+        </section>
+      </div>
+      <div class="mdc-dialog__backdrop"></div>
+    </aside>
   </header>
 
+  <!-- Dashboard and control panel -->
+  <main>
+    <div class="mdc-top-app-bar--fixed-adjust"></div>
+    <h1>Hello World!!!</h1>
+
+
+  </main>
 </body>
 </html>

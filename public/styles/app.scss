@@ -10,6 +10,10 @@ $mdc-theme-on-background: #C8CCD4;
 
 @import "@material/button/mdc-button";
 @import "@material/top-app-bar/mdc-top-app-bar";
+@import "@material/list/mdc-list";
+@import "@material/menu/mdc-menu";
+@import "@material/menu-surface/mdc-menu-surface";
+@import "@material/dialog/mdc-dialog";
 
 /* General Styles */
 
@@ -64,11 +68,15 @@ html, body {
 
 /** Home Page Settings */
 
+// Toolbar settings
+
 .gw-toolbar {
   @include mdc-top-app-bar-ink-color(white);	
   @include mdc-top-app-bar-fill-color($mdc-theme-surface);
   @include mdc-top-app-bar-icon-ink-color($mdc-theme-on-surface);
   @include mdc-elevation(2);	
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .gw-title {
@@ -106,17 +114,21 @@ html, body {
   background-size: 32px 32px;
   border-radius: 32px;
   border: 2px white solid;
-  margin-right: 10px;
-
 }
 
 .gw-username {
   display: inline-block;
   line-height: 38px;
   vertical-align: top;
-  width: calc(100% - 46px);
+  width: calc(100% - 40px);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   text-align: left;
+  margin-left: 7px;
+}
+
+#gw-menu-dialog
+.mdc-dialog__surface {
+  max-width: 280px;
 }
