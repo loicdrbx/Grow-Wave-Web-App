@@ -1,5 +1,5 @@
 $mdc-theme-primary: #009688;
-$mdc-theme-on-primary: #282C34;
+$mdc-theme-on-primary: #FFFFFF;
 $mdc-theme-secondary: #3E4451;
 $mdc-theme-on-secondary: #C8CCD4;
 $mdc-theme-surface: #353C45;
@@ -14,10 +14,14 @@ $mdc-theme-on-background: #C8CCD4;
 @import "@material/menu/mdc-menu";
 @import "@material/menu-surface/mdc-menu-surface";
 @import "@material/dialog/mdc-dialog";
+@import "@material/fab/mdc-fab";
+@import "@material/card/mdc-card";
+@import "@material/layout-grid/mdc-layout-grid";
 
 /* General Styles */
 
 html, body {
+  min-width: 405px;
   font-family: 'Roboto', 'Helvetica', sans-serif;
   height: 100%;
   color: $mdc-theme-on-background;
@@ -66,9 +70,9 @@ html, body {
   opacity: 0.8;
 }
 
-/** Home Page Settings */
+/** Home Page Styles */
 
-// Toolbar settings
+// Toolbar styles
 
 .gw-toolbar {
   @include mdc-top-app-bar-ink-color(white);	
@@ -131,4 +135,51 @@ html, body {
 #gw-menu-dialog
 .mdc-dialog__surface {
   max-width: 280px;
+}
+
+.gw-units-bar {
+  @include mdc-top-app-bar-fill-color($mdc-theme-secondary);
+  @include mdc-top-app-bar-icon-ink-color($mdc-theme-on-secondary);
+  height: 48px;
+}
+
+.gw-tune-settings {
+  @include mdc-fab-container-color($mdc-theme-primary);
+  @include mdc-fab-ink-color($mdc-theme-on-primary);
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+}
+
+@media(min-width: 1024px) {
+  .gw-tune-settings {
+    bottom: 1.5rem;
+    bottom: 1.5rem;
+  }
+}
+
+// Unit selection toolbar bar styles
+
+.gw-unit-select {
+  width: 200px;
+}
+
+#tmp-card {
+  height: 350px;
+  width: 350px;
+}
+
+// Dashboard styles
+
+.gw-card {
+  @include mdc-elevation(2);
+  background-color: $mdc-theme-secondary;
+  height: 220px;
+  padding: 10px;
+}
+
+.gw-card__title {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }

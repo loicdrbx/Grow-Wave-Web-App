@@ -54,6 +54,10 @@
       </section>
     </div>
 
+    <div class="mdc-top-app-bar__row gw-units-bar">
+
+    </div>
+
     <!-- Menu for user options -->
     <!-- TODO: Replace dialog (it's not accessible) with a proper drop down menu-->
     <aside id="gw-menu-dialog" class="mdc-dialog">
@@ -84,7 +88,51 @@
   <!-- Dashboard and control panel -->
   <main>
     <div class="mdc-top-app-bar--fixed-adjust"></div>
-    <h1>Hello World!!!</h1>
+    <div class="mdc-top-app-bar--dense-fixed-adjust"></div>
+    <!-- Floating Action Button to control dashboard settings -->
+    <button class="mdc-fab gw-tune-settings">
+      <span class="material-icons mdc-fab__icon">tune</span>
+    </button>
+    <!-- Responsive grid containg action cards -->
+    <div class="mdc-layout-grid">
+      <div class="mdc-layout-grid__inner">
+        <!-- Temperature monitor-->
+        <div class="gw-card mdc-layout-grid__cell">
+          <section class="gw-card__title">Temperature</section>
+        </div>
+        <!-- pH monitor -->
+        <div class="gw-card mdc-layout-grid__cell">
+          <section class="gw-card__title">pH</section>
+        </div>
+        <!-- Grow Lights switch-->
+        <div class="gw-card mdc-layout-grid__cell">
+          <section class="gw-card__title">Grow Lights</section>
+        </div>
+        <!-- Main pump controls -->
+        <div class="gw-card mdc-layout-grid__cell">
+          <section class="gw-card__title">Main Pump</section>
+        </div>
+        <!-- Dosing pump #1 controls -->
+        <div class="gw-card mdc-layout-grid__cell">
+          <section class="gw-card__title">Dosing Pump 1</section>
+        </div>
+        <!-- Dosing pump #2 controls -->
+        <div class="gw-card mdc-layout-grid__cell">
+          <section class="gw-card__title">Dosing Pump 2</section>
+        </div>
+        <!-- Clock control -->
+        <div class="gw-card mdc-layout-grid__cell">
+          <section class="gw-card__title">Clock</section>
+        </div>
+        <!-- Auto top-off switch -->
+        <div class="gw-card mdc-layout-grid__cell">
+          <section class="gw-card__title">Auto Top-Off</section>
+        </div>
+      </div>
+    </div>    
+    
+
+
 
 
   </main>

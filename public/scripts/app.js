@@ -7,7 +7,7 @@ import {MDCDialog} from '@material/dialog';
 const topAppBarElement = document.querySelector('.mdc-top-app-bar');
 const topAppBar = new MDCTopAppBar(topAppBarElement);
 const dialog = new MDCDialog(document.querySelector('#gw-menu-dialog'));
-
+const fabRipple = new MDCRipple(document.querySelector('.mdc-fab'));
 
 (function() {
 
