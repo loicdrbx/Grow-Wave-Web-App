@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,500,300">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Amaranth:700">
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://cdn.materialdesignicons.com/2.6.95/css/materialdesignicons.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css">
   <link rel="stylesheet" href="bundle.css">
 
@@ -89,44 +90,92 @@
   <main>
     <div class="mdc-top-app-bar--fixed-adjust"></div>
     <div class="mdc-top-app-bar--dense-fixed-adjust"></div>
+
     <!-- Floating Action Button to control dashboard settings -->
-    <button class="mdc-fab gw-tune-settings">
+    <button id="tune-fab" class="mdc-fab gw-tune-settings">
       <span class="material-icons mdc-fab__icon">tune</span>
     </button>
+
     <!-- Responsive grid containg action cards -->
     <div class="mdc-layout-grid">
       <div class="mdc-layout-grid__inner">
+
         <!-- Temperature monitor-->
         <div class="gw-card mdc-layout-grid__cell">
           <section class="gw-card__title">Temperature</section>
+          <section class="gw_card__content">
+            <div class="card-icon mdi mdi-thermometer-lines with-margin"></div>
+            <div id="temperature" class="card-icon__text">22°C</div>
+          </section>
         </div>
+
         <!-- pH monitor -->
         <div class="gw-card mdc-layout-grid__cell">
           <section class="gw-card__title">pH</section>
+          <section class="gw_card__content">
+            <div class="card-icon mdi mdi-gauge with-margin"></div>
+            <div id="pH" class="card-icon__text">7.2</div>
+          </section>
         </div>
+
+        <!-- Auto top-off switch -->
+        <div class="gw-card mdc-layout-grid__cell">
+          <section class="gw-card__title">Auto Top-Off</section>
+          <secion class="gw-card__content">
+            <div id="autoTopOff-icon" class="card-icon mdi mdi-water"></div>
+          </secion>
+          <section class="gw-card__action">
+            <button id="autoTopOff" class="mdc-button mdc-button--unelevated">Enable</button>
+          </section>
+        </div>
+
         <!-- Grow Lights switch-->
         <div class="gw-card mdc-layout-grid__cell">
           <section class="gw-card__title">Grow Lights</section>
+          <section class="gw_card__content">
+            <div class="card-icon mdi mdi-flashlight"></div>
+            <div class="card-icon__form">
+              <div class="gw-timefield mdc-text-field mdc-text-field--upgraded">
+                <input type="text" id="lts-onAt" class="mdc-text-field__input">
+                <label class="mdc-floating-label" for="lts-onAt">Turn on time</label>
+                <div class="mdc-line-ripple"></div>
+              </div>
+              <div class="gw-timefield mdc-text-field">
+                <input type="text" id="lts-offAt" class="mdc-text-field__input">
+                <label class="mdc-floating-label" for="lts-offAt">Turn off time</label>
+                <div class="mdc-line-ripple"></div>
+              </div>
+            </div>
+          </section>
+          <section class="gw-card__action">
+            <button id="lts-enabled" class="mdc-button mdc-button--unelevated">Enable</button>
+          </section>
         </div>
+
         <!-- Main pump controls -->
         <div class="gw-card mdc-layout-grid__cell">
           <section class="gw-card__title">Main Pump</section>
+          <section class="gw-card__content"></section>
+          <section class="gw-card__action"></section>
         </div>
+        
         <!-- Dosing pump #1 controls -->
         <div class="gw-card mdc-layout-grid__cell">
           <section class="gw-card__title">Dosing Pump 1</section>
+          <section class="gw-card__content"></section>
+          <section class="gw-card__action"></section>
         </div>
         <!-- Dosing pump #2 controls -->
         <div class="gw-card mdc-layout-grid__cell">
           <section class="gw-card__title">Dosing Pump 2</section>
+          <section class="gw-card__content"></section>
+          <section class="gw-card__action"></section>
         </div>
         <!-- Clock control -->
         <div class="gw-card mdc-layout-grid__cell">
           <section class="gw-card__title">Clock</section>
-        </div>
-        <!-- Auto top-off switch -->
-        <div class="gw-card mdc-layout-grid__cell">
-          <section class="gw-card__title">Auto Top-Off</section>
+          <section class="gw-card__content"></section>
+          <section class="gw-card__action"></section>
         </div>
       </div>
     </div>    

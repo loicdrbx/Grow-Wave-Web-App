@@ -2,12 +2,21 @@
 import {MDCRipple} from '@material/ripple';
 import {MDCTopAppBar} from '@material/top-app-bar/index';
 import {MDCDialog} from '@material/dialog';
+import {MDCTextField} from '@material/textfield';
 
 /** Instantiation of necessary Material Web Components */
 const topAppBarElement = document.querySelector('.mdc-top-app-bar');
 const topAppBar = new MDCTopAppBar(topAppBarElement);
 const dialog = new MDCDialog(document.querySelector('#gw-menu-dialog'));
-const fabRipple = new MDCRipple(document.querySelector('.mdc-fab'));
+new MDCRipple(document.querySelector('#tune-fab'));
+const buttons = document.querySelectorAll('.mdc-button');
+buttons.forEach(function(button) {
+  const b = new MDCRipple(button);
+})
+const textFields = document.querySelectorAll('.mdc-text-field');
+textFields.forEach(function(textfield) {
+  const t = new MDCTextField(textfield);
+});
 
 (function() {
 

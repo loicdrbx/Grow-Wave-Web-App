@@ -1,5 +1,5 @@
 $mdc-theme-primary: #009688;
-$mdc-theme-on-primary: #FFFFFF;
+$mdc-theme-on-primary: rgba(255, 255, 255, 0.9);
 $mdc-theme-secondary: #3E4451;
 $mdc-theme-on-secondary: #C8CCD4;
 $mdc-theme-surface: #353C45;
@@ -15,8 +15,8 @@ $mdc-theme-on-background: #C8CCD4;
 @import "@material/menu-surface/mdc-menu-surface";
 @import "@material/dialog/mdc-dialog";
 @import "@material/fab/mdc-fab";
-@import "@material/card/mdc-card";
 @import "@material/layout-grid/mdc-layout-grid";
+@import "@material/textfield/mdc-text-field";
 
 /* General Styles */
 
@@ -29,7 +29,7 @@ html, body {
 }
 
 .mdc-button {
-  @include mdc-button-ink-color($mdc-theme-on-surface);
+  @include mdc-button-ink-color($mdc-theme-on-primary);
 }
 
 /* Landing page styles */
@@ -160,14 +160,6 @@ html, body {
 
 // Unit selection toolbar bar styles
 
-.gw-unit-select {
-  width: 200px;
-}
-
-#tmp-card {
-  height: 350px;
-  width: 350px;
-}
 
 // Dashboard styles
 
@@ -175,11 +167,53 @@ html, body {
   @include mdc-elevation(2);
   background-color: $mdc-theme-secondary;
   height: 220px;
-  padding: 10px;
+  min-width: 250px;
+  display: block;
 }
 
 .gw-card__title {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
+  text-align: center;
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 38px;
+  background-color: $mdc-theme-surface;
+}
+
+.gw_card__content {
+  display: flex;
+  justify-content: center;
+}
+
+.card-icon {
+  position: relative;
+  top: 5px;
+  font-size: 110px;
+  text-align: center;
+}
+
+.card-icon.with-margin {
+  margin-right: 20px;
+  top: 20px;
+}
+
+.card-icon__text {
+  position: relative;
+  font-size: 50px;
+  top: 50px;
+}
+
+.gw-card__action {
+  display: flex;
+  justify-content: center;
+}
+
+.card-icon__form {
+  top: 13px;
+}
+
+.gw-timefield {
+  width: 95px;
+  display: flex !important;
+  margin-top: 0px !important;
+  margin-bottom: 0px !important;
 }
