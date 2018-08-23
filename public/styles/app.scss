@@ -6,6 +6,7 @@ $mdc-theme-surface: #353C45;
 $mdc-theme-on-surface: #C8CCD4;
 $mdc-theme-background: #282c34;
 $mdc-theme-on-background: #C8CCD4;
+$corner-radius: 15px;
 
 
 @import "@material/button/mdc-button";
@@ -17,6 +18,8 @@ $mdc-theme-on-background: #C8CCD4;
 @import "@material/fab/mdc-fab";
 @import "@material/layout-grid/mdc-layout-grid";
 @import "@material/textfield/mdc-text-field";
+@import "@material/line-ripple/mdc-line-ripple";
+@import "@material/notched-outline/mdc-notched-outline";
 
 /* General Styles */
 
@@ -30,6 +33,45 @@ html, body {
 
 .mdc-button {
   @include mdc-button-ink-color($mdc-theme-on-primary);
+  @include mdc-button-corner-radius($corner-radius);
+}
+
+.mdc-text-field__input {
+  text-align: center;
+}
+
+.mdc-text-field {
+  @include mdc-notched-outline-corner-radius(8px);
+  @include mdc-notched-outline-idle-corner-radius(8px);
+}
+
+.mdc-layout-grid__cell {
+  border-radius: $corner-radius;
+}
+
+.mdc-layout-grid {
+  max-width: 1320px;
+}
+
+// Move to home
+.gw-tune-settings {
+  z-index: 99;
+}
+
+.mdc-dialog__surface {
+  border-radius: $corner-radius;
+}
+
+@media screen and (max-width: 559px) {
+  .mdc-layout-grid {
+    max-width: 375px;
+  }
+}
+
+@media screen and (max-width: 405px) {
+  .gw-usernamelink {
+    display: none;
+  }
 }
 
 /* Landing page styles */
@@ -166,8 +208,7 @@ html, body {
 .gw-card {
   @include mdc-elevation(2);
   background-color: $mdc-theme-secondary;
-  height: 220px;
-  min-width: 250px;
+  height: 230px;
   display: block;
 }
 
@@ -177,6 +218,8 @@ html, body {
   font-size: 18px;
   line-height: 38px;
   background-color: $mdc-theme-surface;
+  border-top-left-radius: inherit;
+  border-top-right-radius: inherit;
 }
 
 .gw_card__content {
@@ -189,6 +232,7 @@ html, body {
   top: 5px;
   font-size: 110px;
   text-align: center;
+  margin-right: 10px;
 }
 
 .card-icon.with-margin {
@@ -205,15 +249,18 @@ html, body {
 .gw-card__action {
   display: flex;
   justify-content: center;
+  margin-top: 10px;
 }
 
 .card-icon__form {
-  top: 13px;
+  position: relative;
+  top: 10px;
 }
 
-.gw-timefield {
-  width: 95px;
+.gw-textfield {
+  width: 120px;
+  height: 48px !important;
   display: flex !important;
-  margin-top: 0px !important;
-  margin-bottom: 0px !important;
+  margin-top: 8px !important;
+  margin-bottom: 8px !important;
 }

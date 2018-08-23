@@ -111,7 +111,7 @@
 
         <!-- pH monitor -->
         <div class="gw-card mdc-layout-grid__cell">
-          <section class="gw-card__title">pH</section>
+          <section class="gw-card__title">pH Level</section>
           <section class="gw_card__content">
             <div class="card-icon mdi mdi-gauge with-margin"></div>
             <div id="pH" class="card-icon__text">7.2</div>
@@ -122,7 +122,7 @@
         <div class="gw-card mdc-layout-grid__cell">
           <section class="gw-card__title">Auto Top-Off</section>
           <secion class="gw-card__content">
-            <div id="autoTopOff-icon" class="card-icon mdi mdi-water"></div>
+            <div id="autoTopOff-icon" class="card-icon mdi mdi-water-off"></div>
           </secion>
           <section class="gw-card__action">
             <button id="autoTopOff" class="mdc-button mdc-button--unelevated">Enable</button>
@@ -133,17 +133,27 @@
         <div class="gw-card mdc-layout-grid__cell">
           <section class="gw-card__title">Grow Lights</section>
           <section class="gw_card__content">
-            <div class="card-icon mdi mdi-flashlight"></div>
+            <div id="lts-enabled-icon" class="card-icon mdi mdi-led-variant-off"></div>
             <div class="card-icon__form">
-              <div class="gw-timefield mdc-text-field mdc-text-field--upgraded">
-                <input type="text" id="lts-onAt" class="mdc-text-field__input">
-                <label class="mdc-floating-label" for="lts-onAt">Turn on time</label>
-                <div class="mdc-line-ripple"></div>
+              <div class="gw-textfield mdc-text-field mdc-text-field--outlined mdc-text-field--upgraded mdc-text-field--dense">
+                <input type="text" id="lts-onAt" class="mdc-text-field__input" value="04:21" pattern="^([01]\d|2[0-3]):?([0-5]\d)$" minlength="5" maxlength="5" required>
+                <label class="mdc-floating-label" for="lts-onAt">On time (24h):</label>
+                <div class="mdc-notched-outline">
+                  <svg>
+                    <path class="mdc-notched-outline__path"/>
+                  </svg>
+                </div>
+                <div class="mdc-notched-outline__idle"></div>
               </div>
-              <div class="gw-timefield mdc-text-field">
-                <input type="text" id="lts-offAt" class="mdc-text-field__input">
-                <label class="mdc-floating-label" for="lts-offAt">Turn off time</label>
-                <div class="mdc-line-ripple"></div>
+              <div class="gw-textfield mdc-text-field mdc-text-field--outlined mdc-text-field--upgraded mdc-text-field--dense">
+                <input type="text" id="lts-offAt" class="mdc-text-field__input" value="16:21" pattern="^([01]\d|2[0-3]):?([0-5]\d)$" minlength="5" maxlength="5" required>
+                <label class="mdc-floating-label" for="lts-offAt">Off time (24h):</label>
+                <div class="mdc-notched-outline">
+                  <svg>
+                    <path class="mdc-notched-outline__path"/>
+                  </svg>
+                </div>
+                <div class="mdc-notched-outline__idle"></div>
               </div>
             </div>
           </section>
@@ -155,35 +165,104 @@
         <!-- Main pump controls -->
         <div class="gw-card mdc-layout-grid__cell">
           <section class="gw-card__title">Main Pump</section>
-          <section class="gw-card__content"></section>
-          <section class="gw-card__action"></section>
+          <section class="gw_card__content">
+            <div id="mp-enabled-icon" class="card-icon mdi mdi-fan-off"></div>
+            <div class="card-icon__form">
+              <div class="gw-textfield mdc-text-field mdc-text-field--outlined mdc-text-field--upgraded mdc-text-field--dense">
+                <input type="number" id="mp-onTime" class="mdc-text-field__input" value="45" min="5" max="120" step="5" required>
+                <label class="mdc-floating-label" for="mp-onTime">Minutes on:</label>
+                <div class="mdc-notched-outline">
+                  <svg>
+                    <path class="mdc-notched-outline__path"/>
+                  </svg>
+                </div>
+                <div class="mdc-notched-outline__idle"></div>
+              </div>
+              <div class="gw-textfield mdc-text-field mdc-text-field--outlined mdc-text-field--upgraded mdc-text-field--dense">
+                <input type="number" id="mp-offTime" class="mdc-text-field__input" value="10" min="5" max="120" step="5" required>
+                <label class="mdc-floating-label" for="mp-offTime">Minutes off:</label>
+                <div class="mdc-notched-outline">
+                  <svg>
+                    <path class="mdc-notched-outline__path"/>
+                  </svg>
+                </div>
+                <div class="mdc-notched-outline__idle"></div>
+              </div>
+            </div>
+          </section>
+          <section class="gw-card__action">
+            <button id="mp-enabled" class="mdc-button mdc-button--unelevated">Enable</button>
+          </section>
         </div>
         
         <!-- Dosing pump #1 controls -->
         <div class="gw-card mdc-layout-grid__cell">
           <section class="gw-card__title">Dosing Pump 1</section>
-          <section class="gw-card__content"></section>
-          <section class="gw-card__action"></section>
+          <section class="gw_card__content">
+            <div id="dp1-enabled-icon" class="card-icon mdi mdi-cup-off"></div>
+            <div class="card-icon__text">
+              <div class="gw-textfield mdc-text-field mdc-text-field--outlined mdc-text-field--upgraded mdc-text-field--dense">
+                <input type="number" id="dp1-amount" class="mdc-text-field__input" value="100" min="25" max="1000" step="25" required>
+                <label class="mdc-floating-label" for="dp1-amount">Amount (mL):</label>
+                <div class="mdc-notched-outline">
+                  <svg>
+                    <path class="mdc-notched-outline__path"/>
+                  </svg>
+                </div>
+                <div class="mdc-notched-outline__idle"></div>
+              </div>
+            </div>
+          </section>
+          <section class="gw-card__action">
+            <button id="dp1-enabled" class="mdc-button mdc-button--unelevated">Enable</button>
+          </section>
         </div>
+
         <!-- Dosing pump #2 controls -->
         <div class="gw-card mdc-layout-grid__cell">
           <section class="gw-card__title">Dosing Pump 2</section>
-          <section class="gw-card__content"></section>
-          <section class="gw-card__action"></section>
+          <section class="gw_card__content">
+            <div id="dp2-enabled-icon" class="card-icon mdi mdi-cup-off"></div>
+            <div class="card-icon__text">
+              <div class="gw-textfield mdc-text-field mdc-text-field--outlined mdc-text-field--upgraded mdc-text-field--dense">
+                <input type="number" id="dp2-amount" class="mdc-text-field__input" value="100" min="25" max="1000" step="25" required>
+                <label class="mdc-floating-label" for="dp2-amount">Amount (mL):</label>
+                <div class="mdc-notched-outline">
+                  <svg>
+                    <path class="mdc-notched-outline__path"/>
+                  </svg>
+                </div>
+                <div class="mdc-notched-outline__idle"></div>
+              </div>
+            </div>
+          </section>
+          <section class="gw-card__action">
+            <button id="dp2-enabled" class="mdc-button mdc-button--unelevated">Enable</button>
+          </section>
         </div>
+
         <!-- Clock control -->
         <div class="gw-card mdc-layout-grid__cell">
           <section class="gw-card__title">Clock</section>
-          <section class="gw-card__content"></section>
-          <section class="gw-card__action"></section>
+          <section class="gw_card__content">
+            <div class="card-icon mdi mdi-clock-outline"></div>
+            <div class="card-icon__text">
+              <div class="gw-textfield mdc-text-field mdc-text-field--outlined mdc-text-field--upgraded mdc-text-field--dense">
+                <input type="text" id="clock" class="mdc-text-field__input" value="04:21" pattern="^([01]\d|2[0-3]):?([0-5]\d)$" minlength="5" maxlength="5" required>
+                <label class="mdc-floating-label" for="clock">Time (24h):</label>
+                <div class="mdc-notched-outline">
+                  <svg>
+                    <path class="mdc-notched-outline__path"/>
+                  </svg>
+                </div>
+                <div class="mdc-notched-outline__idle"></div>
+              </div>
+            </div>
+          </section>
         </div>
-      </div>
+
     </div>    
     
-
-
-
-
   </main>
 </body>
 </html>

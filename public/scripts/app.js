@@ -3,6 +3,8 @@ import {MDCRipple} from '@material/ripple';
 import {MDCTopAppBar} from '@material/top-app-bar/index';
 import {MDCDialog} from '@material/dialog';
 import {MDCTextField} from '@material/textfield';
+import {MDCLineRipple} from '@material/line-ripple';
+import {MDCNotchedOutline} from '@material/notched-outline';
 
 /** Instantiation of necessary Material Web Components */
 const topAppBarElement = document.querySelector('.mdc-top-app-bar');
@@ -16,6 +18,14 @@ buttons.forEach(function(button) {
 const textFields = document.querySelectorAll('.mdc-text-field');
 textFields.forEach(function(textfield) {
   const t = new MDCTextField(textfield);
+});
+const lineRipples = document.querySelectorAll('.mdc-line-ripple');
+lineRipples.forEach(function(lineRipple) {
+  const r = new MDCLineRipple(lineRipple);
+});
+const notchedOutlines = document.querySelectorAll('.mdc-notched-outline');
+notchedOutlines.forEach(function(notchedOutline) {
+  const n = new MDCNotchedOutline(notchedOutline);
 });
 
 (function() {
