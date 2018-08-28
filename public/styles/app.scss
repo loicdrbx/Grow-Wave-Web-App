@@ -50,7 +50,22 @@ html, body {
 }
 
 .mdc-layout-grid {
-  max-width: 1320px;
+  
+  // The sass mixins below do not work as intended, see: https://bit.ly/2LvcDyQ
+  // To remedy this, /node_modules/@material/layout-grid/_variables.scss
+  // has been modified as follows:
+  //    $mdc-layout-grid-breakpoints: (
+  //      ...
+  //      tablet: 560px,
+  //      ...
+  //    ) !default;
+  //    $mdc-layout-grid-max-width: 1320px !default;
+  // You may have to reinstate these values as they are unlikely to survive an update
+  // or git cloning.
+
+
+  @include mdc-layout-grid('tablet', 16px, 840px);
+  @include mdc-layout-grid-max-width(1320px);
 }
 
 // Move to home
