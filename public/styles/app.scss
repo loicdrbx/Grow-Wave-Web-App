@@ -65,7 +65,7 @@ html, body {
 
 
   @include mdc-layout-grid('tablet', 16px, 840px);
-  @include mdc-layout-grid-max-width(1320px);
+  // @include mdc-layout-grid-max-width(1320px);
 }
 
 // Move to home
@@ -216,6 +216,10 @@ html, body {
 }
 
 // Unit selection toolbar bar styles
+
+#unit-input {
+  margin-bottom: 20px;
+}
 
 
 // Dashboard styles
