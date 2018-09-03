@@ -111,11 +111,17 @@ notchedOutlines.forEach(function(notchedOutline) {
       var elemClass = elem.className.split(" ");
       
       if (elemClass[0] == "updatable-text") {
-        // Special case for time elements
-        if (elemClass[1] == "time") {
-          data = minutesToTime(data);
+        switch(elemClass[1]) {
+          case "time": 
+            data = minutesToTime(data);
+            elem.value = data;
+          case "tmp":
+            elem.innerText = data + "°C";
+          case "pH":
+            elem.innerHTML = data;
+          default:
+            elem.value = data;
         }
-        elem.value = data;
         // console.log("Updated " + key + " to " + data);
       }
       
@@ -138,7 +144,7 @@ notchedOutlines.forEach(function(notchedOutline) {
       newData[button.id] = val;
       deviceRef.update(newData)
       .then(function() {
-        console.log(button.id + "set to " + val);
+        console.log(button.id + " set to " + val);
       }).catch(function() {
         console.log("Got an error: ", error);
       });
@@ -170,6 +176,37 @@ notchedOutlines.forEach(function(notchedOutline) {
         });
       }
     });
+  });
+
+  // Monitor any database side changes
+  // and update UI accordingly
+  deviceRef.on('child_changed', function(snapshot) {
+
+    var key = snapshot.key.toString();
+    var data = snapshot.val();
+    var elem = document.getElementById(key);
+    var elemClass = elem.className.split(" ");
+    
+    if (elemClass[0] == "updatable-button") {
+      elem.innerText = data ? "DISABLE" : "ENABLE";
+      toggleIconInit(elem, data);
+      // console.log("Updated " + key + " to " + data);
+    }
+
+    if(elemClass[0] == "updatable-text") {
+      switch(elemClass[1]) {
+        case "time": 
+          data = minutesToTime(data);
+          elem.value = data;
+        case "tmp":
+          elem.innerText = data + "°C";
+        case "pH":
+          elem.innerHTML = data;
+        default:
+          elem.value = data;
+      }
+      // console.log("Updated " + key + " to " + data);
+    }
   });
 
   // Toggles the icon associated with a given
@@ -252,7 +289,6 @@ notchedOutlines.forEach(function(notchedOutline) {
         return /^[0-9]+$/.test(val) && val >= 5 && val <= 120;
       case "mp-onTime":
         return /^[0-9]+$/.test(val) && val >= 5 && val <= 120;
-
       default: return false;
     }
   }
