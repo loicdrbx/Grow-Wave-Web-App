@@ -115,10 +115,13 @@ notchedOutlines.forEach(function(notchedOutline) {
           case "time": 
             data = minutesToTime(data);
             elem.value = data;
+            break;
           case "tmp":
-            elem.innerText = data + "°C";
+            elem.innerText = data += "°C";
+            break;
           case "pH":
             elem.innerHTML = data;
+            break;
           default:
             elem.value = data;
         }
@@ -167,7 +170,7 @@ notchedOutlines.forEach(function(notchedOutline) {
       // Commit change to database if data is valid
       if (isValid) {
         var newData = new Object();
-        newData[textField.id] = val;
+        newData[textField.id] = +val;
         deviceRef.update(newData)
         .then(function() {
           console.log(textField.id + " set to " + val);
@@ -198,10 +201,13 @@ notchedOutlines.forEach(function(notchedOutline) {
         case "time": 
           data = minutesToTime(data);
           elem.value = data;
+          break;
         case "tmp":
-          elem.innerText = data + "°C";
+          elem.innerText = data += "°C";
+          break;
         case "pH":
           elem.innerHTML = data;
+          break;
         default:
           elem.value = data;
       }

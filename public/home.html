@@ -57,6 +57,7 @@
 
     <!-- Chip bar for added units -->
     <div class="mdc-top-app-bar__row gw-units-bar">
+
     </div>
 
     <!-- Menu for user options -->
@@ -136,7 +137,7 @@
             <div id="lts-enabled-icon" class="card-icon mdi mdi-led-variant-off"></div>
             <div class="card-icon__form">
               <div class="gw-textfield mdc-text-field mdc-text-field--outlined mdc-text-field--upgraded mdc-text-field--dense">
-                <input type="time" id="lts-onAt" class="updatable-text time mdc-text-field__input" value="04:21" pattern="^([01]\d|2[0-3]):?([0-5]\d)$" minlength="5" maxlength="5" required>
+                <input type="text" id="lts-onAt" class="updatable-text time mdc-text-field__input" value="04:21" pattern="^([01]\d|2[0-3]):?([0-5]\d)$" minlength="5" maxlength="5" required>
                 <label class="mdc-floating-label" for="lts-onAt">On time (24h):</label>
                 <div class="mdc-notched-outline">
                   <svg>
@@ -146,7 +147,7 @@
                 <div class="mdc-notched-outline__idle"></div>
               </div>
               <div class="gw-textfield mdc-text-field mdc-text-field--outlined mdc-text-field--upgraded mdc-text-field--dense">
-                <input type="time" id="lts-offAt" class="updatable-text time mdc-text-field__input" value="16:21" pattern="^([01]\d|2[0-3]):?([0-5]\d)$" minlength="5" maxlength="5" required>
+                <input type="text" id="lts-offAt" class="updatable-text time mdc-text-field__input" value="16:21" pattern="^([01]\d|2[0-3]):?([0-5]\d)$" minlength="5" maxlength="5" required>
                 <label class="mdc-floating-label" for="lts-offAt">Off time (24h):</label>
                 <div class="mdc-notched-outline">
                   <svg>
@@ -248,7 +249,7 @@
             <div class="card-icon mdi mdi-clock-outline"></div>
             <div class="card-icon__text">
               <div class="gw-textfield mdc-text-field mdc-text-field--outlined mdc-text-field--upgraded mdc-text-field--dense">
-                <input type="time" id="clock" class="updatable-text time mdc-text-field__input" value="04:21" pattern="^([01]\d|2[0-3]):?([0-5]\d)$" minlength="5" maxlength="5" required>
+                <input type="text" id="clock" class="updatable-text time mdc-text-field__input" value="04:21" pattern="^([01]\d|2[0-3]):?([0-5]\d)$" minlength="5" maxlength="5" required>
                 <label class="mdc-floating-label" for="clock">Time (24h):</label>
                 <div class="mdc-notched-outline">
                   <svg>
@@ -261,8 +262,8 @@
           </section>
         </div>
 
-    </div>    
-    
+    </div>
+       
   </main>
 </body>
 </html>

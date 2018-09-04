@@ -68,11 +68,6 @@ html, body {
   // @include mdc-layout-grid-max-width(1320px);
 }
 
-// Move to home
-.gw-tune-settings {
-  z-index: 99;
-}
-
 .mdc-dialog__surface {
   border-radius: $corner-radius;
 }
@@ -287,3 +282,9 @@ html, body {
   margin-top: 8px !important;
   margin-bottom: 8px !important;
 }
+
+// Miscellaneous
+.gw-tune-settings {
+  z-index: 99;
+}
+
