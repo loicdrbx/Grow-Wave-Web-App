@@ -1,0 +1,35 @@
+/** Update device configuration when data is written to firebase */
+exports.updateDeviceConfig = functions.https.onRequest((req, res) => {
+
+  data = JSON.parse(req.body);
+  const deviceId = data.deviceId;
+  const device_name = `projects/${PROJECT_ID}/locations/${REGION}/registries/${REGISTRY}/devices/${deviceId}`;
+
+  const newConfig = req.body;
+  const binaryData = Buffer.from(newConfig).toString('base64');
+
+  const request = {
+    name: device_name,
+    version_to_update: VERSION,
+    binary_data: binaryData
+  };
+
+  console.log(request);
+
+  getIoTClient(serviceAccount, function(client) {
+
+    console.log(client);
+    client.projects.locations.registries.devices.modifyCloudToDeviceConfig(request,
+      (err, data) => {
+        if (err) {
+          console.log('Could not update config:', deviceId);
+          console.log('Message: ', err);
+        } else {
+          console.log('Success :', data);
+        }
+      });
+
+  });
+
+  return true;
+});

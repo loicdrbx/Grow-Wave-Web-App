@@ -37,66 +37,67 @@ exports.receiveTelemetry = functions.pubsub
     console.log("Data recieved from " + deviceId + ":\n" + message.data);
     // Update database with recieved data
     return db.ref(`/devices/${deviceId}`).update(data);
-  });
-
+});
 
 /** Update device configuration when data is written to firebase */
-exports.updateDeviceConfig = functions.https.onRequest((req, res) => {
+exports.updateConfig = functions.database.ref('/devices/{deviceId}/{setting}')
+  .onUpdate((change, context) => {
+    
+    if (context.authType === 'USER') {
+      const data = change.after.val();
+      const setting = context.params.setting;
+      const deviceId = context.params.deviceId;
+      const device_name = `projects/${PROJECT_ID}/locations/${REGION}/registries/${REGISTRY}/devices/${deviceId}`;
 
-  data = JSON.parse(req.body);
-  const deviceId = data.deviceId;
-  const device_name = `projects/${PROJECT_ID}/locations/${REGION}/registries/${REGISTRY}/devices/${deviceId}`;
+      var newConfig = new Object();
+      newConfig[setting] = data;
+      newConfig = JSON.stringify(newConfig);
 
-  const newConfig = req.body;
-  const binaryData = Buffer.from(newConfig).toString('base64');
+      const binaryData = Buffer.from(newConfig).toString('base64');
 
-  const request = {
-    name: device_name,
-    version_to_update: VERSION,
-    binary_data: binaryData
-  };
+      const request = {
+        name: device_name,
+        version_to_update: VERSION,
+        binary_data: binaryData
+      };
 
-  console.log(request);
-
-  getClient(serviceAccount, function(client) {
-
-    console.log(client);
-    client.projects.locations.registries.devices.modifyCloudToDeviceConfig(request,
-      (err, data) => {
-        if (err) {
-          console.log('Could not update config:', deviceId);
-          console.log('Message: ', err);
-        } else {
-          console.log('Success :', data);
-        }
+      return getIoTClient(serviceAccount, (client) => {
+        client.projects.locations.registries.devices.modifyCloudToDeviceConfig(request,
+          (err, data) => {
+            if (err) {
+              console.log('Could not update config for:', deviceId, 'Message: ', err);
+            } else {
+              console.log('Success :', data);
+            }
+          });
       });
-
+    } else {
+      // Do nothing
+      console.log("You must be an authenticated user to update a device's configuration");
+      return null;
+    }
+    
   });
 
-  return true;
-});
 
 /**
  * Returns an authorized API client by discovering the Cloud 
  * IoT Core API with the provided API key.
  */
-function getClient (serviceAccountJson, cb) {
-  google.auth.getClient({
+function getIoTClient (serviceAccountJson, cb) {
+  return google.auth.getClient({
     scopes: ['https://www.googleapis.com/auth/cloud-platform']
   }).then(authClient => {
     const discoveryUrl =`${DISCOVERY_API}?version=${API_VERSION}`;
-
     google.options({
       auth: authClient
     });
 
-    google.discoverAPI(discoveryUrl).then((client) => {
-      cb(client);
-      return;
+    return google.discoverAPI(discoveryUrl).then((client) => {
+       return cb(client);
     }).catch((err) => {
       console.log('Error during API discovery.', err);
     });
-    return;
   }).catch((err) => {
     console.log('Error', err);
   });
