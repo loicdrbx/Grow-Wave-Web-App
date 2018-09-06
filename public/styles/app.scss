@@ -108,15 +108,15 @@ html, body {
 }
 
 .gw-logo img {
-  height: 44px;
-  width: 44px;
+  height: 128px;
+  width: auto;
   top: 8px;
   margin-right: 0px;
   position: relative;
 }
 
 .gw-caption {
-  margin: 20px 0 40px 0;
+  margin: 10px 0 40px 0;
   font-family: 'Amaranth', sans-serif;
   font-size: 20px;
   opacity: 0.8;
@@ -140,15 +140,9 @@ html, body {
   margin-left: 10px;
 }
 
-.gw-title a {
-  color: white;
-  font-size: 24px;
-  text-decoration: none;
-}
-
 .gw-title img {
   height: 40px;
-  width: 40px;
+  width: auto;
   top: -3px;
   position: relative;
   vertical-align: middle;
