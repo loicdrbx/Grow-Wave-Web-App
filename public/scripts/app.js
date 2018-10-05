@@ -48,8 +48,19 @@ notchedOutlines.forEach(function(notchedOutline) {
     }  
   });
 
-  // Display user's name and photo on toolbar
+  // Handle a signed in user
   function handleSignedInUser(user) {
+
+    // If user is new, add them to the database
+    firebase.database().ref('users/' + currentUid).once('value', function(snapshot) {
+      if (!snapshot.exists()) {
+        firebase.database().ref('users/' + currentUid).set({
+          units: ['']
+        });
+      }
+    })
+
+    // Display user's name and photo on toolbar
     document.querySelector('.gw-username').textContent = user.displayName;
     if (user.photoURL) {
       var photoURL = user.photoURL;
@@ -99,6 +110,7 @@ notchedOutlines.forEach(function(notchedOutline) {
   const db = firebase.database();
   // Create references to freuquently used paths
   const deviceRef = db.ref('devices/esp32_1D3438');
+  const usersRef = db.ref('users/');
 
   // Sync dashboard to latest data when app opens
   deviceRef.once('value', function(snapshot) {
