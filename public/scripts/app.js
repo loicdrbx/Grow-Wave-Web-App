@@ -32,32 +32,35 @@ const select = new MDCSelect(document.querySelector('.mdc-select'));
 
 (function() {
 
-  /** User Authentification Functions */
+  // Monitor user auth changes
 
   var userId = null; // Track the UID of the current user
 
-  // Monitor user auth changes
   firebase.auth().onAuthStateChanged(function(user) { 
     // If auth change is a sign-in
     if (user && user.uid != userId) {
       userId = user.uid;     // save userID
-      handleSignedInUser(user);  // handle user
+      handleUserSignIn(user);  // handle user
+      loadDashboard();
       console.log("New login from:", user.displayName);
     } else {
       // Auth change is a sign-out
       userId = null;                      // reset userID
       window.location.replace("index.html");  // redirect to landing page
-    }  
+    }
   });
 
+  /** User authentification helper functions */
+
   // Handle a signed in user
-  function handleSignedInUser(user) {
+  function handleUserSignIn(user) {
 
     // If user is new, add them to the database
     firebase.database().ref('users/' + userId).once('value', function(snapshot) {
       if (!snapshot.exists()) {
         firebase.database().ref('users/' + userId).set({
-          units: ['']
+          units: [''],
+          defaultUnit: ''
         });
       }
     })
@@ -79,7 +82,7 @@ const select = new MDCSelect(document.querySelector('.mdc-select'));
       document.querySelector('.gw-avatar').style.backgroundImage = "url(./images/avatar.jpg)";
     }
   }
-  
+
   // Monitor sign-out button
   document.getElementById('sign-out').addEventListener('click', function() {
     firebase.auth().signOut(); // sign user out
@@ -117,25 +120,122 @@ const select = new MDCSelect(document.querySelector('.mdc-select'));
     }
   };
 
-  /** Dashboard-Control Functions  */
+  /** Loads and runs dashboard while user is logged in */
 
-  // Get a reference to the database
-  const db = firebase.database();
-  // Create references to freuquently used paths
-  const deviceRef = db.ref('devices/esp32_1D3438');
-  const usersRef = db.ref('users/');
+  function loadDashboard() {
 
-  // Sync dashboard to latest data when app opens
-  deviceRef.once('value', function(snapshot) {
+    // Get a reference to the database
+    const db = firebase.database();
+    // Create references to frequently used paths
+    const deviceRef = db.ref('devices/esp32_1D3438');
+    const usersRef = db.ref('users/' + userId);
 
-    snapshot.forEach(function(childSnapshot) {
-      
-      var key = childSnapshot.key;
-      var data = childSnapshot.val();
+    console.log(usersRef);
+
+    // Sync dashboard to latest unit data when app opens
+    deviceRef.once('value', function(snapshot) {
+
+      snapshot.forEach(function(childSnapshot) {
+        
+        var key = childSnapshot.key;
+        var data = childSnapshot.val();
+        var elem = document.getElementById(key);
+        var elemClass = elem.className.split(" ");
+        
+        if (elemClass[0] == "updatable-text") {
+          switch(elemClass[1]) {
+            case "time": 
+              data = minutesToTime(data);
+              elem.value = data;
+              break;
+            case "tmp":
+              elem.innerText = data += "°C";
+              break;
+            case "pH":
+              elem.innerHTML = data;
+              break;
+            default:
+              elem.value = data;
+          }
+          // console.log("Updated " + key + " to " + data);
+        }
+        
+        if (elemClass[0] == "updatable-button") {
+          elem.innerText = (data) ? "DISABLE" : "ENABLE";
+          toggleIconInit(elem, data);
+        }
+      });
+    });
+
+    // Sync user information to the latest data when app opens
+    usersRef.once('value', function(snapshot) {
+
+      // console.log(snapshot.val());
+
+    });
+
+    // Monitor updatable buttons for clicks
+    document.querySelectorAll('.updatable-button').forEach(function(button) {
+      button.addEventListener('click', function() {
+        // Toggle button text and icon
+        var val = (button.innerText == "ENABLE") ? true : false;
+        button.innerText = val ? "DISABLE" : "ENABLE";
+        toggleIcon(button);
+        // Commit change to database
+        var newData = new Object();
+        newData[button.id] = val;
+        deviceRef.update(newData)
+        .then(function() {
+          console.log(button.id + " set to " + val);
+        }).catch(function() {
+          console.log("Got an error: ", error);
+        });
+      });
+    });
+
+    // Monitor updatable textfields for changes
+    document.querySelectorAll('.updatable-text').forEach(function(textField) {
+      textField.addEventListener('change', function() {
+        var elem = document.getElementById(textField.id);
+        var elemClass = elem.className.split(" ");
+        var val = this.value
+        var isValid = validateInput(val, textField.id)
+        // Special case for time objects
+        if (elemClass[1] == "time") {
+          console.log(val);
+          val = checkAndConvertTime(val);
+          isValid = val != null;
+        }
+        // Commit change to database if data is valid
+        if (isValid) {
+          var newData = new Object();
+          newData[textField.id] = +val;
+          deviceRef.update(newData)
+          .then(function() {
+            console.log(textField.id + " set to " + val);
+          }).catch(function() {
+            console.log("Got an error: ", error);
+          });
+        }
+      });
+    });
+
+    // Monitor any database side changes
+    // and update UI accordingly
+    deviceRef.on('child_changed', function(snapshot) {
+
+      var key = snapshot.key.toString();
+      var data = snapshot.val();
       var elem = document.getElementById(key);
       var elemClass = elem.className.split(" ");
       
-      if (elemClass[0] == "updatable-text") {
+      if (elemClass[0] == "updatable-button") {
+        elem.innerText = data ? "DISABLE" : "ENABLE";
+        toggleIconInit(elem, data);
+        // console.log("Updated " + key + " to " + data);
+      }
+
+      if(elemClass[0] == "updatable-text") {
         switch(elemClass[1]) {
           case "time": 
             data = minutesToTime(data);
@@ -152,93 +252,11 @@ const select = new MDCSelect(document.querySelector('.mdc-select'));
         }
         // console.log("Updated " + key + " to " + data);
       }
-      
-      if (elemClass[0] == "updatable-button") {
-        elem.innerText = (data) ? "DISABLE" : "ENABLE";
-        toggleIconInit(elem, data);
-      }
     });
-  });
 
-  // Monitor updatable buttons for clicks
-  document.querySelectorAll('.updatable-button').forEach(function(button) {
-    button.addEventListener('click', function() {
-      // Toggle button text and icon
-      var val = (button.innerText == "ENABLE") ? true : false;
-      button.innerText = val ? "DISABLE" : "ENABLE";
-      toggleIcon(button);
-      // Commit change to database
-      var newData = new Object();
-      newData[button.id] = val;
-      deviceRef.update(newData)
-      .then(function() {
-        console.log(button.id + " set to " + val);
-      }).catch(function() {
-        console.log("Got an error: ", error);
-      });
-    });
-  });
+  }
 
-  // Monitor updatable textfields for changes
-  document.querySelectorAll('.updatable-text').forEach(function(textField) {
-    textField.addEventListener('change', function() {
-      var elem = document.getElementById(textField.id);
-      var elemClass = elem.className.split(" ");
-      var val = this.value
-      var isValid = validateInput(val, textField.id)
-      // Special case for time objects
-      if (elemClass[1] == "time") {
-        console.log(val);
-        val = checkAndConvertTime(val);
-        isValid = val != null;
-      }
-      // Commit change to database if data is valid
-      if (isValid) {
-        var newData = new Object();
-        newData[textField.id] = +val;
-        deviceRef.update(newData)
-        .then(function() {
-          console.log(textField.id + " set to " + val);
-        }).catch(function() {
-          console.log("Got an error: ", error);
-        });
-      }
-    });
-  });
-
-  // Monitor any database side changes
-  // and update UI accordingly
-  deviceRef.on('child_changed', function(snapshot) {
-
-    var key = snapshot.key.toString();
-    var data = snapshot.val();
-    var elem = document.getElementById(key);
-    var elemClass = elem.className.split(" ");
-    
-    if (elemClass[0] == "updatable-button") {
-      elem.innerText = data ? "DISABLE" : "ENABLE";
-      toggleIconInit(elem, data);
-      // console.log("Updated " + key + " to " + data);
-    }
-
-    if(elemClass[0] == "updatable-text") {
-      switch(elemClass[1]) {
-        case "time": 
-          data = minutesToTime(data);
-          elem.value = data;
-          break;
-        case "tmp":
-          elem.innerText = data += "°C";
-          break;
-        case "pH":
-          elem.innerHTML = data;
-          break;
-        default:
-          elem.value = data;
-      }
-      // console.log("Updated " + key + " to " + data);
-    }
-  });
+  /** Dashboard Helper functions */
 
   // Toggles the icon associated with a given
   // HTML element from one state to another
@@ -332,5 +350,7 @@ const select = new MDCSelect(document.querySelector('.mdc-select'));
     dialog.lastFocusedTarget = evt.target;
     dialog.show();
   });
+
+  
 
 })();
