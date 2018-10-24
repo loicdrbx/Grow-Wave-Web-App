@@ -5,6 +5,7 @@ import {MDCDialog} from '@material/dialog';
 import {MDCTextField} from '@material/textfield';
 import {MDCLineRipple} from '@material/line-ripple';
 import {MDCNotchedOutline} from '@material/notched-outline';
+import {MDCSelect} from '@material/select';
 
 /** Instantiation of necessary Material Web Components */
 const topAppBarElement = document.querySelector('.mdc-top-app-bar');
@@ -27,23 +28,24 @@ const notchedOutlines = document.querySelectorAll('.mdc-notched-outline');
 notchedOutlines.forEach(function(notchedOutline) {
   const n = new MDCNotchedOutline(notchedOutline);
 });
+const select = new MDCSelect(document.querySelector('.mdc-select'));
 
 (function() {
 
   /** User Authentification Functions */
 
-  var currentUid = null; // Track the UID of the current user
+  var userId = null; // Track the UID of the current user
 
   // Monitor user auth changes
   firebase.auth().onAuthStateChanged(function(user) { 
     // If auth change is a sign-in
-    if (user && user.uid != currentUid) {
-      currentUid = user.uid;     // save userID
+    if (user && user.uid != userId) {
+      userId = user.uid;     // save userID
       handleSignedInUser(user);  // handle user
       console.log("New login from:", user.displayName);
     } else {
       // Auth change is a sign-out
-      currentUid = null;                      // reset userID
+      userId = null;                      // reset userID
       window.location.replace("index.html");  // redirect to landing page
     }  
   });
@@ -52,9 +54,9 @@ notchedOutlines.forEach(function(notchedOutline) {
   function handleSignedInUser(user) {
 
     // If user is new, add them to the database
-    firebase.database().ref('users/' + currentUid).once('value', function(snapshot) {
+    firebase.database().ref('users/' + userId).once('value', function(snapshot) {
       if (!snapshot.exists()) {
-        firebase.database().ref('users/' + currentUid).set({
+        firebase.database().ref('users/' + userId).set({
           units: ['']
         });
       }
@@ -88,10 +90,16 @@ notchedOutlines.forEach(function(notchedOutline) {
     deleteAccount();
   });
 
-  // Delete the user's account
+  // Delete the user's account and information
   function deleteAccount()  {
+
+    var tempId = userId;
+    var deleteError = false;
+
+    // Delete acccount
     firebase.auth().currentUser.delete().catch(function(error) {
       if (error.code == 'auth/requires-recent-login') {
+        deleteError = true;
         // The user's credential is too old. They need to sign in again.
         firebase.auth().signOut().then(function() {
           // The timeout allows the message to be displayed after the UI has
@@ -102,6 +110,11 @@ notchedOutlines.forEach(function(notchedOutline) {
         });
       }
     });
+
+    // Delete user information only after their account is deleted
+    if (!deleteError) {
+      firebase.database().ref('users/' + tempId).remove();
+    }
   };
 
   /** Dashboard-Control Functions  */

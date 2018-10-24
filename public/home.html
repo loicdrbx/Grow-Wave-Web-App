@@ -88,6 +88,26 @@
   <!-- Dashboard and control panel -->
   <main>
     <div class="mdc-top-app-bar--fixed-adjust"></div>
+
+    <!-- Drop down unit Selector -->
+    <div class="gw-unit-select mdc-select mdc-select--outlined">
+      <select class="mdc-select__native-control">
+        <option value="esp8266_1A7084">
+          esp8266_1A7084
+        </option>
+        <option value="esp32_1D3438">
+          esp32_1D3438
+        </option>
+
+      </select>
+      <label class="mdc-floating-label">Growwave unit</label>
+      <div class="mdc-notched-outline">
+        <svg>
+          <path class="mdc-notched-outline__path"></path>
+        </svg>
+      </div>
+      <div class="mdc-notched-outline__idle"></div>
+    </div>
     
     <!-- Floating Action Button to control dashboard settings -->
     <button id="tune-fab" class="mdc-fab gw-tune-settings">
@@ -258,9 +278,10 @@
             </div>
           </section>
         </div>
-
+          
+      </div>
     </div>
-       
+
   </main>
 </body>
 </html>

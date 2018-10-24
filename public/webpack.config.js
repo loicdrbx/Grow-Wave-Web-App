@@ -1,3 +1,5 @@
+const autoprefixer = require('autoprefixer');
+
 module.exports = [
   {
     entry: './styles/app.scss',
@@ -18,6 +20,12 @@ module.exports = [
           },
           { loader: 'extract-loader' },
           { loader: 'css-loader' },
+          {
+            loader: 'postcss-loader',
+            options: {
+               plugins: () => [autoprefixer()]
+            }
+          },
           {
             loader: 'sass-loader',
             options: {
