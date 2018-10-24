@@ -282,13 +282,12 @@ html, body {
   z-index: 99;
 }
 
+.gw-unit-select-holder {
+  display: table;
+  margin: 0 auto;
+}
+
 .gw-unit-select {
   margin-top: 20px;
-  margin-left: 30px;
 }
 
-.me {
-
-  justify-content: center;
-  width: 100%;
-}
