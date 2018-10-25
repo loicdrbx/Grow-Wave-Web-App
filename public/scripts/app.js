@@ -10,7 +10,8 @@ import {MDCSelect} from '@material/select';
 /** Instantiation of necessary Material Web Components */
 const topAppBarElement = document.querySelector('.mdc-top-app-bar');
 const topAppBar = new MDCTopAppBar(topAppBarElement);
-const dialog = new MDCDialog(document.querySelector('#gw-menu-dialog'));
+const menuDialog = new MDCDialog(document.querySelector('#gw-menu-dialog'));
+// const addUnitDialog = new MDCDialog(document.querySelector('#gw-add-unit-dialog'));
 new MDCRipple(document.querySelector('#tune-fab'));
 const buttons = document.querySelectorAll('.mdc-button');
 buttons.forEach(function(button) {
@@ -35,6 +36,8 @@ const select = new MDCSelect(document.querySelector('.mdc-select'));
   // Monitor user auth changes
 
   var userId = null; // Track the UID of the current user
+  var userUnits;
+  var userDefaultUnit;
 
   firebase.auth().onAuthStateChanged(function(user) { 
     // If auth change is a sign-in
@@ -130,8 +133,6 @@ const select = new MDCSelect(document.querySelector('.mdc-select'));
     const deviceRef = db.ref('devices/esp32_1D3438');
     const usersRef = db.ref('users/' + userId);
 
-    console.log(usersRef);
-
     // Sync dashboard to latest unit data when app opens
     deviceRef.once('value', function(snapshot) {
 
@@ -170,11 +171,25 @@ const select = new MDCSelect(document.querySelector('.mdc-select'));
     // Sync user information to the latest data when app opens
     usersRef.once('value', function(snapshot) {
 
-      // console.log(snapshot.val());
+      userUnits = snapshot.val().units;
+      userDefaultUnit = snapshot.val().defaultUnit;
+      var select = document.getElementById("unit-select");
 
+      // Populate unit select dropdown
+      for (var i = 0; i < userUnits.length; i++) {
+        var option = document.createElement("option");
+        option.value = i;
+        option.innerHTML = userUnits[i];
+        select.appendChild(option);
+      }
+
+      // Select user's default unit
+      select.value = userDefaultUnit;
+      select.focus(); // successive focus and blur
+      select.blur();  // to fix UI glitch
     });
 
-    // Monitor updatable buttons for clicks
+    // Monitor enable/disable buttons for clicks
     document.querySelectorAll('.updatable-button').forEach(function(button) {
       button.addEventListener('click', function() {
         // Toggle button text and icon
@@ -251,6 +266,30 @@ const select = new MDCSelect(document.querySelector('.mdc-select'));
             elem.value = data;
         }
         // console.log("Updated " + key + " to " + data);
+      }
+    });
+
+    // Monitor changes in unit select dropdown
+    // and update database accordingly
+    document.getElementById('unit-select').addEventListener('change', function (evt) {
+      usersRef.child("defaultUnit").set(this.value);   
+    });
+
+    // Monitor unit delete button
+    // The current default unit will be deleted
+    document.getElementById('delete-unit').addEventListener('click', function (evt) {
+
+      // Make user confirm delete decision
+      if (window.confirm("Are you sure you want to delete this unit?")) {
+        // Delete unit from units array
+        userUnits.splice(userDefaultUnit, 1);
+        // Update html
+        var select = document.getElementById("unit-select");
+        select.remove(userDefaultUnit);
+        // Update firebase
+        userDefaultUnit = 0;
+        usersRef.child("units").set(userUnits);
+        usersRef.child("defaultUnit").set(userDefaultUnit);
       }
     });
 
@@ -344,13 +383,13 @@ const select = new MDCSelect(document.querySelector('.mdc-select'));
 
   /** Miscellaneous Functioons */
 
-  var menu = document.getElementById('gw-menu');
-
-  menu.addEventListener('click', function (evt) {
-    dialog.lastFocusedTarget = evt.target;
-    dialog.show();
+  document.getElementById('gw-menu').addEventListener('click', function (evt) {
+    menuDialog.lastFocusedTarget = evt.target;
+    menuDialog.show();
   });
 
-  
+  document.getElementById('add-unit').addEventListener('click', function (evt) {
+
+  });
 
 })();

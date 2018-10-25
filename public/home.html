@@ -58,7 +58,7 @@
 
     </div> -->
 
-    <!-- Menu for user options -->
+    <!-- Dialog for user options -->
     <!-- TODO: Replace dialog (it's not accessible) with a proper drop down menu-->
     <aside id="gw-menu-dialog" class="mdc-dialog">
       <div class="mdc-dialog__surface">
@@ -83,6 +83,17 @@
       </div>
       <div class="mdc-dialog__backdrop"></div>
     </aside>
+
+    <!-- Dialog for adding new unit-->
+    <aside id="gw-unit-unit-dialog" class="mdc-dialog">
+      <div class="mdc-dialog__surface">
+        <section class="mdc-dialog__body">
+
+        </section>
+      </div>
+      <div class="mdc-dialog__backdrop"></div>
+    </aside>
+
   </header>
 
   <!-- Dashboard and control panel -->
@@ -94,30 +105,33 @@
       <span class="material-icons mdc-fab__icon">tune</span>
     </button>
 
-    <!-- Dropdown unit Selector -->
-    <div class="gw-unit-select-holder">
-      <div class="gw-unit-select mdc-select mdc-select--outlined">
-        <select class="mdc-select__native-control">
-          <option value="esp8266_1A7084">
-            esp8266_1A7084
-          </option>
-          <option value="esp32_1D3438">
-            esp32_1D3438
-          </option>
-        </select>
-        <label class="mdc-floating-label">Growwave unit</label>
-        <div class="mdc-notched-outline">
-          <svg>
-            <path class="mdc-notched-outline__path"></path>
-          </svg>
-        </div>
-        <div class="mdc-notched-outline__idle"></div>
-      </div>
-    </div>
-
     <!-- Responsive grid containg action cards -->
     <div class="mdc-layout-grid">
       <div class="mdc-layout-grid__inner">
+
+        <!-- Unit selection -->
+        <div class="gw-card mdc-layout-grid__cell">
+          <section class="gw-card__title">Growwave Unit</section>
+          <section class="gw_card__content">
+            <div class="gw-unit-select mdc-select mdc-select--outlined">
+              <select id="unit-select" class="mdc-select__native-control">
+              </select>
+              <label class="mdc-floating-label">Growwave unit</label>
+              <div class="mdc-notched-outline">
+                <svg>
+                  <path class="mdc-notched-outline__path"></path>
+                </svg>
+              </div>
+              <div class="mdc-notched-outline__idle"></div>
+            </div>
+          </section>
+          <section class="gw-card__action">
+            <button id="add-unit" class="mdc-button mdc-button--unelevated">ADD UNIT</button>
+          </section>
+          <section class="gw-card__action">
+            <button id="delete-unit" class="mdc-button mdc-button--unelevated">DELETE UNIT</button>
+          </section>
+        </div>
 
         <!-- Temperature monitor-->
         <div class="gw-card mdc-layout-grid__cell">

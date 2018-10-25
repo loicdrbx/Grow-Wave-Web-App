@@ -6,7 +6,9 @@ $mdc-theme-surface: #353C45;
 $mdc-theme-on-surface: #C8CCD4;
 $mdc-theme-background: #282c34;
 $mdc-theme-on-background: #C8CCD4;
+$mdc-theme-alert: rgb(240, 88, 0);
 $corner-radius: 15px;
+$rtl-reflexive: false;
 
 @import "@material/button/mdc-button";
 @import "@material/top-app-bar/mdc-top-app-bar";
@@ -282,12 +284,22 @@ html, body {
   z-index: 99;
 }
 
-.gw-unit-select-holder {
-  display: table;
-  margin: 0 auto;
-}
-
 .gw-unit-select {
   margin-top: 20px;
+  width: 170px;
+  // The sass mixins below do not work as intended
+  // To remedy this, /node_modules/@material/select/_variables.scss
+  // has been modified as follows:
+  //    $mdc-select-border-radius: 10px;
+  // You may have to reinstate these values as they are unlikely to survive an update
+  // or git cloning.
+  // @include mdc-select-outline-shape-radius($corner-radius, $rtl-reflexive)
 }
 
+#add-unit, #delete-unit {
+  width: 170px;
+}
+
+#delete-unit {
+  background-color: $mdc-theme-alert;
+}
