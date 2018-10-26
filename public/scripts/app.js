@@ -3,6 +3,7 @@ import {MDCRipple} from '@material/ripple';
 import {MDCTopAppBar} from '@material/top-app-bar/index';
 import {MDCDialog} from '@material/dialog';
 import {MDCTextField} from '@material/textfield';
+import {MDCTextFieldHelperText} from '@material/textfield/helper-text';
 import {MDCLineRipple} from '@material/line-ripple';
 import {MDCNotchedOutline} from '@material/notched-outline';
 import {MDCSelect} from '@material/select';
@@ -11,7 +12,7 @@ import {MDCSelect} from '@material/select';
 const topAppBarElement = document.querySelector('.mdc-top-app-bar');
 const topAppBar = new MDCTopAppBar(topAppBarElement);
 const menuDialog = new MDCDialog(document.querySelector('#gw-menu-dialog'));
-// const addUnitDialog = new MDCDialog(document.querySelector('#gw-add-unit-dialog'));
+const addUnitDialog = new MDCDialog(document.querySelector('#gw-add-unit-dialog'));
 new MDCRipple(document.querySelector('#tune-fab'));
 const buttons = document.querySelectorAll('.mdc-button');
 buttons.forEach(function(button) {
@@ -21,6 +22,10 @@ const textFields = document.querySelectorAll('.mdc-text-field');
 textFields.forEach(function(textfield) {
   const t = new MDCTextField(textfield);
 });
+const helperTexts = document.querySelectorAll('.mdc-text-field-helper-text');
+helperTexts.forEach(function(helperText) {
+  const h = new MDCTextFieldHelperText(helperText);
+})
 const lineRipples = document.querySelectorAll('.mdc-line-ripple');
 lineRipples.forEach(function(lineRipple) {
   const r = new MDCLineRipple(lineRipple);
@@ -389,7 +394,9 @@ const select = new MDCSelect(document.querySelector('.mdc-select'));
   });
 
   document.getElementById('add-unit').addEventListener('click', function (evt) {
-
+    addUnitDialog.lastFocusedTarget = evt.target;
+    addUnitDialog.show();
+    // addUnitDialog.close();
   });
 
 })();

@@ -19,6 +19,7 @@ $rtl-reflexive: false;
 @import "@material/fab/mdc-fab";
 @import "@material/layout-grid/mdc-layout-grid";
 @import "@material/textfield/mdc-text-field";
+@import "@material/textfield/helper-text/mdc-text-field-helper-text";
 @import "@material/line-ripple/mdc-line-ripple";
 @import "@material/notched-outline/mdc-notched-outline";
 @import "@material/select/mdc-select";
@@ -182,7 +183,12 @@ html, body {
 
 #gw-menu-dialog
 .mdc-dialog__surface {
-  max-width: 280px;
+  max-width: 250px;
+}
+
+#gw-add-unit-dialog
+.mdc-dialog__surface {
+  max-width: 250px;
 }
 
 .gw-units-bar {
@@ -208,10 +214,9 @@ html, body {
 
 // Unit selection toolbar bar styles
 
-/* #unit-input {
-  margin-bottom: 20px;
+.gw-long-textfield {
+  width: 170px;
 }
- */
 
 // Dashboard styles
 

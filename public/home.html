@@ -85,14 +85,49 @@
     </aside>
 
     <!-- Dialog for adding new unit-->
-    <aside id="gw-unit-unit-dialog" class="mdc-dialog">
-      <div class="mdc-dialog__surface">
-        <section class="mdc-dialog__body">
+    <aside id="gw-add-unit-dialog" class="mdc-dialog">
+        <div class="mdc-dialog__surface">
 
-        </section>
-      </div>
-      <div class="mdc-dialog__backdrop"></div>
-    </aside>
+          <header class="mdc-dialog__header">
+              <h2 id="mdc-dialog-login-label" class="mdc-dialog__header__title">
+                Add A Growwave Unit
+              </h2>
+          </header>
+
+          <section class="mdc-dialog__body">
+            <div class="gw-long-textfield mdc-text-field mdc-text-field--outlined mdc-text-field--upgraded mdc-text-field--dense">
+              <input type="text" id="add-unit-id" class="mdc-text-field__input" pattern="^[a-zA-Z0-9_]*$" minlength="12" maxlength="12" required>
+              <label class="mdc-floating-label" for="add-unit-id">Unit ID</label>
+              <div class="mdc-notched-outline">
+                <svg>
+                  <path class="mdc-notched-outline__path"/>
+                </svg>
+              </div>
+              <div class="mdc-notched-outline__idle"></div>
+            </div> 
+            <p class="mdc-text-field-helper-text mdc-text-field-helper-text--persistent" aria-hidden="true">Ex: Gwave_XXXXXX</p>           
+      
+            <div class="gw-long-textfield mdc-text-field mdc-text-field--outlined mdc-text-field--upgraded mdc-text-field--dense">
+              <input type="text" id="add-unit-nickname" class="mdc-text-field__input" pattern="^[a-zA-Z0-9]*$" minlength="1">
+              <label class="mdc-floating-label" for="add-unit-nickname">Unit Nickname</label>
+              <div class="mdc-notched-outline">
+                <svg>
+                  <path class="mdc-notched-outline__path"/>
+                </svg>
+              </div>
+              <div class="mdc-notched-outline__idle"></div>
+            </div>
+          </section>
+        
+
+          <footer class="mdc-dialog__footer">
+            <button type="button" class="mdc-button mdc-dialog__footer__button--cancel">Cancel</button>
+            <button type="button" class="mdc-button mdc-button--raised mdc-dialog__footer__button">Add Unit</button>
+          </footer>
+
+        </div>
+        <div class="mdc-dialog__backdrop"></div>
+      </aside>
 
   </header>
 
