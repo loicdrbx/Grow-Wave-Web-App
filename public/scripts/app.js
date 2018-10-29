@@ -277,6 +277,7 @@ const select = new MDCSelect(document.querySelector('.mdc-select'));
     // Monitor changes in unit select dropdown
     // and update database accordingly
     document.getElementById('unit-select').addEventListener('change', function (evt) {
+      console.log(this.value);
       usersRef.child("defaultUnit").set(this.value);   
     });
 
@@ -296,6 +297,41 @@ const select = new MDCSelect(document.querySelector('.mdc-select'));
         usersRef.child("units").set(userUnits);
         usersRef.child("defaultUnit").set(userDefaultUnit);
       }
+    });
+
+    // Monitor add unit button (the oe that validates input)
+    document.getElementById('add-unit-2').addEventListener('click', function (evt) {
+
+      var newUnitTextfield = document.getElementById('add-unit-id');
+      var select = document.getElementById("unit-select");
+      var newUnitId = document.getElementById('add-unit-id').value;
+      var unitHelper = document.getElementById('gw-unit-helper');
+      var nicknameHelper = document.getElementById('gw-nickname-helper');
+
+      // BUG FIX: Update userUnits directly from database each time there is a unit change
+
+      // Validate unit Id
+      if (newUnitTextfield.checkValidity()) {
+        firebase.database().ref('devices/' + newUnitId).once('value', function(snapshot) {
+          if (snapshot.exists()) {
+            if (userUnits.includes(newUnitId)) {
+              // Unit is already added
+              console.log("You have already added this unit. It is nicknamed:");
+            } else {
+              // Add new Unit to user's profile
+              userUnits.push(newUnitId);
+              usersRef.child("units").set(userUnits);
+              // Update select
+              console.log(select);
+              select.appendChild(newUnitId); 
+            }
+          } else {
+            console.log('unitId does not exist');
+          }
+        });
+
+      }
+
     });
 
   }
@@ -396,7 +432,6 @@ const select = new MDCSelect(document.querySelector('.mdc-select'));
   document.getElementById('add-unit').addEventListener('click', function (evt) {
     addUnitDialog.lastFocusedTarget = evt.target;
     addUnitDialog.show();
-    // addUnitDialog.close();
   });
 
 })();

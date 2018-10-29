@@ -41,6 +41,7 @@
     "@material/tab-scroller": "^0.38.1",
     "@material/textfield": "^0.38.1",
     "@material/top-app-bar": "^0.38.1",
+    "@material/typography": "^0.40.1",
     "sass-autoprefixer": "^1.0.1"
   }
 }
