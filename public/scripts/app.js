@@ -6,6 +6,7 @@ import {MDCTextField} from '@material/textfield';
 import {MDCTextFieldHelperText} from '@material/textfield/helper-text';
 import {MDCLineRipple} from '@material/line-ripple';
 import {MDCNotchedOutline} from '@material/notched-outline';
+import {MDCSnackbar} from '@material/snackbar';
 import {MDCSelect} from '@material/select';
 
 /** Instantiation of necessary Material Web Components */
@@ -35,6 +36,7 @@ notchedOutlines.forEach(function(notchedOutline) {
   const n = new MDCNotchedOutline(notchedOutline);
 });
 const select = new MDCSelect(document.querySelector('.mdc-select'));
+const addUnitSnackbar = new MDCSnackbar(document.querySelector('#gw-add-unit-snackbar'));
 
 (function() {
 
@@ -138,6 +140,34 @@ const select = new MDCSelect(document.querySelector('.mdc-select'));
     const deviceRef = db.ref('devices/esp32_1D3438');
     const usersRef = db.ref('users/' + userId);
 
+    // Sync user information to the latest data when app opens
+    usersRef.once('value', function(snapshot) {
+
+      userUnits = snapshot.val().units;
+
+      if (userUnits == undefined) {
+        
+
+      } else {
+
+        userDefaultUnit = snapshot.val().defaultUnit;
+        var select = document.getElementById("unit-select");
+  
+        // Populate unit select dropdown
+        for (var i = 0; i < userUnits.length; i++) {
+          var option = document.createElement("option");
+          option.value = i;
+          option.innerHTML = userUnits[i];
+          select.appendChild(option);
+        }
+  
+        // Select user's default unit
+        select.value = userDefaultUnit;
+        select.focus(); // successive focus and blur
+        select.blur();  // to fix UI glitch
+      }
+    });
+    
     // Sync dashboard to latest unit data when app opens
     deviceRef.once('value', function(snapshot) {
 
@@ -171,27 +201,6 @@ const select = new MDCSelect(document.querySelector('.mdc-select'));
           toggleIconInit(elem, data);
         }
       });
-    });
-
-    // Sync user information to the latest data when app opens
-    usersRef.once('value', function(snapshot) {
-
-      userUnits = snapshot.val().units;
-      userDefaultUnit = snapshot.val().defaultUnit;
-      var select = document.getElementById("unit-select");
-
-      // Populate unit select dropdown
-      for (var i = 0; i < userUnits.length; i++) {
-        var option = document.createElement("option");
-        option.value = i;
-        option.innerHTML = userUnits[i];
-        select.appendChild(option);
-      }
-
-      // Select user's default unit
-      select.value = userDefaultUnit;
-      select.focus(); // successive focus and blur
-      select.blur();  // to fix UI glitch
     });
 
     // Monitor enable/disable buttons for clicks
@@ -303,7 +312,6 @@ const select = new MDCSelect(document.querySelector('.mdc-select'));
 
       var newUnitTextfield = document.getElementById('add-unit-id');
       var select = document.getElementById("unit-select");
-      var option = document.createElement("option");
       var newUnitId = document.getElementById('add-unit-id').value;
       var unitHelper = document.getElementById('gw-unit-helper');
       var nicknameHelper = document.getElementById('gw-nickname-helper');
@@ -316,18 +324,20 @@ const select = new MDCSelect(document.querySelector('.mdc-select'));
           if (snapshot.exists()) {
             if (userUnits.includes(newUnitId)) {
               // Unit is already added
-              console.log("You have already added this unit. It is nicknamed:");
+              showUnitSnackbar("Unit is already added");
             } else {
               // Add new Unit to user's profile
               userUnits.push(newUnitId);
               usersRef.child("units").set(userUnits);
               // Update select
+              var option = document.createElement("option");
               option.value = userUnits.length;
               option.innerHTML = newUnitId;
               select.appendChild(option);
             }
           } else {
-            console.log('unitId does not exist');
+            // Unit Id does not exist. Notify user.
+            showUnitSnackbar("Unit ID does not exist");
           }
         });
 
@@ -434,5 +444,12 @@ const select = new MDCSelect(document.querySelector('.mdc-select'));
     addUnitDialog.lastFocusedTarget = evt.target;
     addUnitDialog.show();
   });
+
+  function showSnackbar(message) {
+    const dataObj = {
+      message: message
+    };
+    addUnitSnackbar.show(dataObj);
+  }
 
 })();

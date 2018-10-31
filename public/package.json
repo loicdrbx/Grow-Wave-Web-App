@@ -35,6 +35,7 @@
     "@material/notched-outline": "^0.38.0",
     "@material/ripple": "^0.38.1",
     "@material/select": "^0.38.1",
+    "@material/snackbar": "^0.41.0",
     "@material/tab": "^0.38.1",
     "@material/tab-bar": "^0.38.1",
     "@material/tab-indicator": "^0.38.0",

@@ -24,6 +24,7 @@ $rtl-reflexive: false;
 @import "@material/notched-outline/mdc-notched-outline";
 @import "@material/select/mdc-select";
 @import "@material/typography/mdc-typography";
+@import "@material/snackbar/mdc-snackbar";
 
 /* General Styles */
 
@@ -308,4 +309,8 @@ html, body {
 
 #delete-unit {
   background-color: $mdc-theme-alert;
+}
+
+.hidable {
+  display: none;
 }
