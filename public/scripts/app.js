@@ -36,14 +36,14 @@ notchedOutlines.forEach(function(notchedOutline) {
   const n = new MDCNotchedOutline(notchedOutline);
 });
 const select = new MDCSelect(document.querySelector('.mdc-select'));
-const addUnitSnackbar = new MDCSnackbar(document.querySelector('#gw-add-unit-snackbar'));
+const notificationSnackbar = new MDCSnackbar(document.querySelector('#gw-notification-snackbar'));
 
 (function() {
 
   // Monitor user auth changes
 
   var userId = null; // Track the UID of the current user
-  var userUnits;
+  var userUnits = [];
   var userDefaultUnit;
 
   firebase.auth().onAuthStateChanged(function(user) { 
@@ -143,13 +143,13 @@ const addUnitSnackbar = new MDCSnackbar(document.querySelector('#gw-add-unit-sna
     // Sync user information to the latest data when app opens
     usersRef.once('value', function(snapshot) {
 
-      userUnits = snapshot.val().units;
-
-      if (userUnits == undefined) {
+      if (snapshot.val().units == undefined) {
         
+        notifyUser("Welcome! Add a Growwave unit to get started.")
 
       } else {
 
+        userUnits = snapshot.val().units;
         userDefaultUnit = snapshot.val().defaultUnit;
         var select = document.getElementById("unit-select");
   
@@ -165,6 +165,9 @@ const addUnitSnackbar = new MDCSnackbar(document.querySelector('#gw-add-unit-sna
         select.value = userDefaultUnit;
         select.focus(); // successive focus and blur
         select.blur();  // to fix UI glitch
+
+        // Enable dashboard fields
+        enableFields();
       }
     });
     
@@ -293,21 +296,39 @@ const addUnitSnackbar = new MDCSnackbar(document.querySelector('#gw-add-unit-sna
     // The current default unit will be deleted
     document.getElementById('delete-unit').addEventListener('click', function (evt) {
 
-      // Make user confirm delete decision
-      if (window.confirm("Are you sure you want to delete this unit?")) {
-        // Delete unit from units array
-        userUnits.splice(userDefaultUnit, 1);
-        // Update html
-        var select = document.getElementById("unit-select");
-        select.remove(userDefaultUnit);
-        // Update firebase
-        userDefaultUnit = 0;
-        usersRef.child("units").set(userUnits);
-        usersRef.child("defaultUnit").set(userDefaultUnit);
+      if (userUnits.length == 0) {
+
+        // Notify user that there are no units to delete
+        notifyUser("There are no units to delete.");
+
+      } else {
+
+        // Make user confirm delete decision
+        if (window.confirm("Are you sure you want to delete this unit?")) {
+          // Delete unit from units array
+          var deletedUnit = userUnits.splice(userDefaultUnit, 1);
+          // Update html
+          var select = document.getElementById("unit-select");
+          select.remove(userDefaultUnit);
+          // Update firebase
+          userDefaultUnit = 0;
+          usersRef.child("units").set(userUnits);
+          usersRef.child("defaultUnit").set(userDefaultUnit);
+        }
+
+        // Notify user of deletion
+        notifyUser(deletedUnit[0] + " has been deleted.");
+
+        // User has deleted all fields, disable fields
+        if(userUnits.length == 0) {
+          disableFields();
+        }
+        
       }
+
     });
 
-    // Monitor add unit button (the oe that validates input)
+    // Monitor add unit button (the one that validates input)
     document.getElementById('add-unit-2').addEventListener('click', function (evt) {
 
       var newUnitTextfield = document.getElementById('add-unit-id');
@@ -316,32 +337,35 @@ const addUnitSnackbar = new MDCSnackbar(document.querySelector('#gw-add-unit-sna
       var unitHelper = document.getElementById('gw-unit-helper');
       var nicknameHelper = document.getElementById('gw-nickname-helper');
 
-      // BUG FIX: Update userUnits directly from database each time there is a unit change
-
       // Validate unit Id
-      if (newUnitTextfield.checkValidity()) {
-        firebase.database().ref('devices/' + newUnitId).once('value', function(snapshot) {
-          if (snapshot.exists()) {
-            if (userUnits.includes(newUnitId)) {
-              // Unit is already added
-              showUnitSnackbar("Unit is already added");
-            } else {
-              // Add new Unit to user's profile
-              userUnits.push(newUnitId);
-              usersRef.child("units").set(userUnits);
-              // Update select
-              var option = document.createElement("option");
-              option.value = userUnits.length;
-              option.innerHTML = newUnitId;
-              select.appendChild(option);
-            }
-          } else {
-            // Unit Id does not exist. Notify user.
-            showUnitSnackbar("Unit ID does not exist");
-          }
-        });
+      firebase.database().ref('devices/' + newUnitId).once('value', function(snapshot) {
 
-      }
+        if (snapshot.exists()) {
+          
+          if (userUnits.includes(newUnitId)) {
+            // Unit is already added
+            notifyUser(newUnitId + " is already added.");
+          } else {
+            // Add new Unit to user's profile
+            userUnits.push(newUnitId);
+            usersRef.child("units").set(userUnits);
+            // Update select
+            var option = document.createElement("option");
+            option.value = userUnits.length;
+            option.innerHTML = newUnitId;
+            select.appendChild(option);
+            // Notify user of unit addition
+            notifyUser(newUnitId + " has been added.");
+            // Enable Fields
+            enableFields();
+            // Close Dialog
+            addUnitDialog.close();
+          }
+        } else {
+          // Unit Id does not exist. Notify user.
+          notifyUser(newUnitId + " is not a valid unit ID.");
+        }
+      });
 
     });
 
@@ -445,11 +469,47 @@ const addUnitSnackbar = new MDCSnackbar(document.querySelector('#gw-add-unit-sna
     addUnitDialog.show();
   });
 
-  function showSnackbar(message) {
+  function notifyUser(message) {
     const dataObj = {
       message: message
     };
-    addUnitSnackbar.show(dataObj);
+    notificationSnackbar.show(dataObj);
+  }
+
+  function enableFields() {
+    // Enable dashboard fields
+    var textfields = document.querySelectorAll('.gw-textfield');
+    textfields.forEach(function(textfield) {
+      textfield.classList.remove('mdc-text-field--disabled');
+    });
+    var inputs = document.querySelectorAll('.updatable-text');
+    inputs.forEach(function(input) {
+      input.removeAttribute('disabled');
+    });
+
+    // Enable dashboard fields
+    var buttons = document.querySelectorAll('.updatable-button');
+    buttons.forEach(function(button) {
+      button.removeAttribute('disabled');
+    });
+  }
+
+  function disableFields() {
+    // Enable dashboard fields
+    var textfields = document.querySelectorAll('.gw-textfield');
+    textfields.forEach(function(textfield) {
+      textfield.classList.add('mdc-text-field--disabled');
+    });
+    var inputs = document.querySelectorAll('.updatable-text');
+    inputs.forEach(function(input) {
+      input.setAttribute('disabled', 'disabled');
+    });
+
+    // Enable dashboard fields
+    var buttons = document.querySelectorAll('.updatable-button');
+    buttons.forEach(function(button) {
+      button.setAttribute('disabled', 'disabled');
+    });
   }
 
 })();
