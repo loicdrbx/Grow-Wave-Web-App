@@ -143,12 +143,17 @@ const notificationSnackbar = new MDCSnackbar(document.querySelector('#gw-notific
     // Sync user information to the latest data when app opens
     usersRef.once('value', function(snapshot) {
 
-      if (snapshot.val().units == undefined) {
-        
-        notifyUser("Welcome! Add a Growwave unit to get started.")
+      if (snapshot.val() == null ) {
+
+        notifyUser("Welcome! Add a Growwave unit to get started.");
+
+      } else if (snapshot.val().units == undefined) {
+
+        notifyUser("Add a Growwave unit to get started.");
 
       } else {
 
+        console.log(snapshot.val());
         userUnits = snapshot.val().units;
         userDefaultUnit = snapshot.val().defaultUnit;
         var select = document.getElementById("unit-select");
