@@ -286,6 +286,12 @@ html, body {
   margin-bottom: 8px !important;
 }
 
+.mdc-text-field__input {
+  // Used to fix firefox glitch where 
+  // input arrows are outside textfield 
+  width: 80%
+}
+
 // Miscellaneous
 .gw-tune-settings {
   z-index: 99;
@@ -310,3 +316,4 @@ html, body {
 #delete-unit {
   background-color: $mdc-theme-alert;
 }
+
