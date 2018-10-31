@@ -277,7 +277,6 @@ const select = new MDCSelect(document.querySelector('.mdc-select'));
     // Monitor changes in unit select dropdown
     // and update database accordingly
     document.getElementById('unit-select').addEventListener('change', function (evt) {
-      console.log(this.value);
       usersRef.child("defaultUnit").set(this.value);   
     });
 
@@ -304,6 +303,7 @@ const select = new MDCSelect(document.querySelector('.mdc-select'));
 
       var newUnitTextfield = document.getElementById('add-unit-id');
       var select = document.getElementById("unit-select");
+      var option = document.createElement("option");
       var newUnitId = document.getElementById('add-unit-id').value;
       var unitHelper = document.getElementById('gw-unit-helper');
       var nicknameHelper = document.getElementById('gw-nickname-helper');
@@ -322,8 +322,9 @@ const select = new MDCSelect(document.querySelector('.mdc-select'));
               userUnits.push(newUnitId);
               usersRef.child("units").set(userUnits);
               // Update select
-              console.log(select);
-              select.appendChild(newUnitId); 
+              option.value = userUnits.length;
+              option.innerHTML = newUnitId;
+              select.appendChild(option);
             }
           } else {
             console.log('unitId does not exist');
