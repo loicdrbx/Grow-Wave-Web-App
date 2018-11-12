@@ -19,9 +19,9 @@ $rtl-reflexive: false;
 @import "@material/fab/mdc-fab";
 @import "@material/layout-grid/mdc-layout-grid";
 @import "@material/textfield/mdc-text-field";
+@import "@material/notched-outline/mdc-notched-outline";
 @import "@material/textfield/helper-text/mdc-text-field-helper-text";
 @import "@material/line-ripple/mdc-line-ripple";
-@import "@material/notched-outline/mdc-notched-outline";
 @import "@material/select/mdc-select";
 @import "@material/typography/mdc-typography";
 @import "@material/snackbar/mdc-snackbar";
@@ -73,6 +73,10 @@ html, body {
   // @include mdc-layout-grid-max-width(1320px);
 }
 
+.mdc-dialog {
+  z-index: auto !important; // Fix for safari on mac and ios bug
+                            // where dialogs do not show up
+}
 .mdc-dialog__surface {
   border-radius: $corner-radius;
 }
@@ -309,7 +313,7 @@ html, body {
   // @include mdc-select-outline-shape-radius($corner-radius, $rtl-reflexive)
 }
 
-#add-unit, #delete-unit {
+#add-unit__dashboard, #delete-unit {
   width: 170px;
 }
 

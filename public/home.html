@@ -53,25 +53,20 @@
       </section>
     </div>
 
-    <!-- Chip bar for added units -->
-    <!-- <div class="mdc-top-app-bar__row gw-units-bar">
-
-    </div> -->
-
     <!-- Dialog for user options -->
     <!-- TODO: Replace dialog (it's not accessible) with a proper drop down menu-->
     <aside id="gw-menu-dialog" class="mdc-dialog">
       <div class="mdc-dialog__surface">
         <section class="mdc-dialog__body">
           <ul class="mdc-list">
-            <li id="sign-out" class="mdc-list-item">
+            <a href="#" id="sign-out" class="mdc-list-item mdc-ripple-upgraded">
               <i class="material-icons mdc-list-item__graphic">exit_to_app</i>
-              Sign out
-            </li>
-            <li id="delete-account" class="mdc-list-item">
+              Sign out              
+            </a>
+            <a href="#" id="delete-account" class="mdc-list-item mdc-ripple-upgraded">
               <i class="material-icons mdc-list-item__graphic">cancel</i>
               Delete Account
-            </li>
+            </a>
             <li role="separator" class="mdc-list-divider"></li>
             <!-- TODO: Create and add link to About-Help-Contact page  -->
             <a href="#" class="mdc-list-item mdc-ripple-upgraded">
@@ -105,7 +100,7 @@
           </div> 
           <p id="gw-unit-helper" class="mdc-text-field-helper-text mdc-text-field-helper-text--persistent" aria-hidden="true">Ex: Gwave_XXXXXX</p>           
           <div class="gw-long-textfield mdc-text-field mdc-text-field--outlined mdc-text-field--upgraded mdc-text-field--dense mdc-text-field--disabled" disabled>
-            <input type="text" id="add-unit-nickname" class="mdc-text-field__input" minlength="1">
+            <input type="text" id="add-unit-nickname" class="mdc-text-field__input" minlength="1" disabled>
             <label class="mdc-floating-label" for="add-unit-nickname">Unit Nickname</label>
             <div class="mdc-notched-outline">
               <svg>
@@ -118,7 +113,7 @@
         </section>
         <footer class="mdc-dialog__footer">
           <button type="button" class="mdc-button mdc-dialog__footer__button--cancel">Cancel</button>
-          <button id="add-unit-2" type="button" class="mdc-button mdc-button--raised mdc-dialog__footer__button">Add Unit</button>
+          <button id="add-unit__dialog" type="button" class="mdc-button mdc-button--raised mdc-dialog__footer__button">Add Unit</button>
         </footer>
       </div>
       <div class="mdc-dialog__backdrop"></div>
@@ -155,7 +150,7 @@
           <section class="gw-card__title">Growwave Unit</section>
           <section class="gw_card__content">
             <div class="gw-unit-select mdc-select mdc-select--outlined">
-              <select id="unit-select" class="mdc-select__native-control">
+              <select id="unit-select" name="unit-select" class="mdc-select__native-control">
               </select>
               <label class="mdc-floating-label">Growwave unit</label>
               <div class="mdc-notched-outline">
@@ -167,7 +162,7 @@
             </div>
           </section>
           <section class="gw-card__action">
-            <button id="add-unit" class="mdc-button mdc-button--unelevated">ADD UNIT</button>
+            <button id="add-unit__dashboard" class="mdc-button mdc-button--unelevated">ADD UNIT</button>
           </section>
           <section class="gw-card__action">
             <button id="delete-unit" class="mdc-button mdc-button--unelevated">DELETE UNIT</button>
