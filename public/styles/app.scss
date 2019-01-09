@@ -6,8 +6,9 @@ $mdc-theme-surface: #353C45;
 $mdc-theme-on-surface: #C8CCD4;
 $mdc-theme-background: #282c34;
 $mdc-theme-on-background: #C8CCD4;
+$mdc-theme-alert: rgb(240, 88, 0);
 $corner-radius: 15px;
-
+$rtl-reflexive: false;
 
 @import "@material/button/mdc-button";
 @import "@material/top-app-bar/mdc-top-app-bar";
@@ -18,8 +19,12 @@ $corner-radius: 15px;
 @import "@material/fab/mdc-fab";
 @import "@material/layout-grid/mdc-layout-grid";
 @import "@material/textfield/mdc-text-field";
-@import "@material/line-ripple/mdc-line-ripple";
 @import "@material/notched-outline/mdc-notched-outline";
+@import "@material/textfield/helper-text/mdc-text-field-helper-text";
+@import "@material/line-ripple/mdc-line-ripple";
+@import "@material/select/mdc-select";
+@import "@material/typography/mdc-typography";
+@import "@material/snackbar/mdc-snackbar";
 
 /* General Styles */
 
@@ -68,6 +73,10 @@ html, body {
   // @include mdc-layout-grid-max-width(1320px);
 }
 
+.mdc-dialog {
+  z-index: auto !important; // Fix for safari on mac and ios bug
+                            // where dialogs do not show up
+}
 .mdc-dialog__surface {
   border-radius: $corner-radius;
 }
@@ -180,7 +189,12 @@ html, body {
 
 #gw-menu-dialog
 .mdc-dialog__surface {
-  max-width: 280px;
+  max-width: 250px;
+}
+
+#gw-add-unit-dialog
+.mdc-dialog__surface {
+  max-width: 250px;
 }
 
 .gw-units-bar {
@@ -206,10 +220,9 @@ html, body {
 
 // Unit selection toolbar bar styles
 
-#unit-input {
-  margin-bottom: 20px;
+.gw-long-textfield {
+  width: 170px;
 }
-
 
 // Dashboard styles
 
@@ -277,8 +290,34 @@ html, body {
   margin-bottom: 8px !important;
 }
 
+.mdc-text-field__input {
+  // Used to fix firefox glitch where 
+  // input arrows are outside textfield 
+  width: 80%
+}
+
 // Miscellaneous
 .gw-tune-settings {
   z-index: 99;
+}
+
+.gw-unit-select {
+  margin-top: 20px;
+  width: 170px;
+  // The sass mixins below do not work as intended
+  // To remedy this, /node_modules/@material/select/_variables.scss
+  // has been modified as follows:
+  //    $mdc-select-border-radius: 10px;
+  // You may have to reinstate these values as they are unlikely to survive an update
+  // or git cloning.
+  // @include mdc-select-outline-shape-radius($corner-radius, $rtl-reflexive)
+}
+
+#add-unit__dashboard, #delete-unit {
+  width: 170px;
+}
+
+#delete-unit {
+  background-color: $mdc-theme-alert;
 }
 

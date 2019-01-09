@@ -19,9 +19,9 @@
   <link rel="stylesheet" href="bundle.css">
 
   <!-- Firebase Configuration -->
-  <script src="https://www.gstatic.com/firebasejs/5.1.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/5.1.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/5.1.0/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.5.5/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.5.5/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.5.5/firebase-database.js"></script>
   <script src="./scripts/config.js"></script>
 
   <!-- Scripts -->
@@ -53,25 +53,20 @@
       </section>
     </div>
 
-    <!-- Chip bar for added units -->
-    <div class="mdc-top-app-bar__row gw-units-bar">
-
-    </div>
-
-    <!-- Menu for user options -->
+    <!-- Dialog for user options -->
     <!-- TODO: Replace dialog (it's not accessible) with a proper drop down menu-->
     <aside id="gw-menu-dialog" class="mdc-dialog">
       <div class="mdc-dialog__surface">
         <section class="mdc-dialog__body">
           <ul class="mdc-list">
-            <li id="sign-out" class="mdc-list-item">
+            <a href="#" id="sign-out" class="mdc-list-item mdc-ripple-upgraded">
               <i class="material-icons mdc-list-item__graphic">exit_to_app</i>
-              Sign out
-            </li>
-            <li id="delete-account" class="mdc-list-item">
+              Sign out              
+            </a>
+            <a href="#" id="delete-account" class="mdc-list-item mdc-ripple-upgraded">
               <i class="material-icons mdc-list-item__graphic">cancel</i>
               Delete Account
-            </li>
+            </a>
             <li role="separator" class="mdc-list-divider"></li>
             <!-- TODO: Create and add link to About-Help-Contact page  -->
             <a href="#" class="mdc-list-item mdc-ripple-upgraded">
@@ -83,12 +78,63 @@
       </div>
       <div class="mdc-dialog__backdrop"></div>
     </aside>
+
+    <!-- Dialog for adding new unit-->
+    <aside id="gw-add-unit-dialog" class="mdc-dialog">
+      <div class="mdc-dialog__surface">
+        <header class="mdc-dialog__header">
+            <h2 id="mdc-dialog-login-label" class="mdc-dialog__header__title">
+              Add A Growwave Unit
+            </h2>
+        </header>
+        <section class="mdc-dialog__body">
+          <div class="gw-long-textfield mdc-text-field mdc-text-field--outlined mdc-text-field--upgraded mdc-text-field--dense">
+            <input type="text" id="add-unit-id" class="mdc-text-field__input">
+            <label class="mdc-floating-label" for="add-unit-id">Unit ID</label>
+            <div class="mdc-notched-outline">
+              <svg>
+                <path class="mdc-notched-outline__path"/>
+              </svg>
+            </div>
+            <div class="mdc-notched-outline__idle"></div>
+          </div> 
+          <p id="gw-unit-helper" class="mdc-text-field-helper-text mdc-text-field-helper-text--persistent" aria-hidden="true">Ex: Gwave_XXXXXX</p>           
+          <div class="gw-long-textfield mdc-text-field mdc-text-field--outlined mdc-text-field--upgraded mdc-text-field--dense mdc-text-field--disabled" disabled>
+            <input type="text" id="add-unit-nickname" class="mdc-text-field__input" minlength="1" disabled>
+            <label class="mdc-floating-label" for="add-unit-nickname">Unit Nickname</label>
+            <div class="mdc-notched-outline">
+              <svg>
+                <path class="mdc-notched-outline__path"/>
+              </svg>
+            </div>
+            <div class="mdc-notched-outline__idle"></div>
+          </div>
+          <p id="gw-nickname-helper" class="mdc-text-field-helper-text mdc-text-field-helper-text--persistent" aria-hidden="true"></p>           
+        </section>
+        <footer class="mdc-dialog__footer">
+          <button type="button" class="mdc-button mdc-dialog__footer__button--cancel">Cancel</button>
+          <button id="add-unit__dialog" type="button" class="mdc-button mdc-button--raised mdc-dialog__footer__button">Add Unit</button>
+        </footer>
+      </div>
+      <div class="mdc-dialog__backdrop"></div>
+    </aside>
+
+    <!-- Notification Snackbar -->
+    <div id="gw-notification-snackbar" class="mdc-snackbar"
+        aria-live="assertive"
+        aria-atomic="true"
+        aria-hidden="true">
+      <div class="mdc-snackbar__text"></div>
+      <div class="mdc-snackbar__action-wrapper">
+        <button type="button" class="mdc-snackbar__action-button"></button>
+      </div>
+    </div>    
+
   </header>
 
   <!-- Dashboard and control panel -->
   <main>
     <div class="mdc-top-app-bar--fixed-adjust"></div>
-    <div class="mdc-top-app-bar--dense-fixed-adjust"></div>
 
     <!-- Floating Action Button to control dashboard settings -->
     <button id="tune-fab" class="mdc-fab gw-tune-settings">
@@ -99,12 +145,36 @@
     <div class="mdc-layout-grid">
       <div class="mdc-layout-grid__inner">
 
+        <!-- Unit selection -->
+        <div id="gw-add-unit-card" class="gw-card mdc-layout-grid__cell">
+          <section class="gw-card__title">Growwave Unit</section>
+          <section class="gw_card__content">
+            <div class="gw-unit-select mdc-select mdc-select--outlined">
+              <select id="unit-select" name="unit-select" class="mdc-select__native-control">
+              </select>
+              <label class="mdc-floating-label">Growwave unit</label>
+              <div class="mdc-notched-outline">
+                <svg>
+                  <path class="mdc-notched-outline__path"></path>
+                </svg>
+              </div>
+              <div class="mdc-notched-outline__idle"></div>
+            </div>
+          </section>
+          <section class="gw-card__action">
+            <button id="add-unit__dashboard" class="mdc-button mdc-button--unelevated">ADD UNIT</button>
+          </section>
+          <section class="gw-card__action">
+            <button id="delete-unit" class="mdc-button mdc-button--unelevated">DELETE UNIT</button>
+          </section>
+        </div>
+
         <!-- Temperature monitor-->
         <div class="gw-card mdc-layout-grid__cell">
           <section class="gw-card__title">Temperature</section>
           <section class="gw_card__content">
             <div class="card-icon mdi mdi-thermometer-lines with-margin"></div>
-            <div id="temperature" class="updatable-text tmp card-icon__text">22°C</div>
+            <div id="temperature" class="updatable-text tmp card-icon__text">0°C</div>
           </section>
         </div>
 
@@ -113,7 +183,7 @@
           <section class="gw-card__title">pH Level</section>
           <section class="gw_card__content">
             <div class="card-icon mdi mdi-gauge with-margin"></div>
-            <div id="pH" class="updatable-text pH card-icon__text">7.2</div>
+            <div id="pH" class="updatable-text pH card-icon__text">0.0</div>
           </section>
         </div>
 
@@ -124,7 +194,7 @@
             <div id="autoTopOff-icon" class="card-icon mdi mdi-water-off"></div>
           </section>
           <section class="gw-card__action">
-            <button id="autoTopOff" class="updatable-button mdc-button mdc-button--unelevated">Enable</button>
+            <button id="autoTopOff" class="updatable-button mdc-button mdc-button--unelevated" disabled>Enable</button>
           </section>
         </div>
 
@@ -134,8 +204,8 @@
           <section class="gw_card__content">
             <div id="lts-enabled-icon" class="card-icon mdi mdi-led-variant-off"></div>
             <div class="card-icon__form">
-              <div class="gw-textfield mdc-text-field mdc-text-field--outlined mdc-text-field--upgraded mdc-text-field--dense">
-                <input type="text" id="lts-onAt" class="updatable-text time mdc-text-field__input" value="04:21" pattern="^([01]\d|2[0-3]):?([0-5]\d)$" minlength="5" maxlength="5" required>
+              <div class="gw-textfield mdc-text-field mdc-text-field--outlined mdc-text-field--upgraded mdc-text-field--dense mdc-text-field--disabled">
+                <input type="text" id="lts-onAt" class="updatable-text time mdc-text-field__input" value="00:00" pattern="^([01]\d|2[0-3]):?([0-5]\d)$" minlength="5" maxlength="5" required disabled>
                 <label class="mdc-floating-label" for="lts-onAt">On time (24h):</label>
                 <div class="mdc-notched-outline">
                   <svg>
@@ -144,8 +214,8 @@
                 </div>
                 <div class="mdc-notched-outline__idle"></div>
               </div>
-              <div class="gw-textfield mdc-text-field mdc-text-field--outlined mdc-text-field--upgraded mdc-text-field--dense">
-                <input type="text" id="lts-offAt" class="updatable-text time mdc-text-field__input" value="16:21" pattern="^([01]\d|2[0-3]):?([0-5]\d)$" minlength="5" maxlength="5" required>
+              <div class="gw-textfield mdc-text-field mdc-text-field--outlined mdc-text-field--upgraded mdc-text-field--dense mdc-text-field--disabled">
+                <input type="text" id="lts-offAt" class="updatable-text time mdc-text-field__input" value="00:00" pattern="^([01]\d|2[0-3]):?([0-5]\d)$" minlength="5" maxlength="5" required disabled>
                 <label class="mdc-floating-label" for="lts-offAt">Off time (24h):</label>
                 <div class="mdc-notched-outline">
                   <svg>
@@ -157,7 +227,7 @@
             </div>
           </section>
           <section class="gw-card__action">
-            <button id="lts-enabled" class="updatable-button mdc-button mdc-button--unelevated">Enable</button>
+            <button id="lts-enabled" class="updatable-button mdc-button mdc-button--unelevated" disabled>Enable</button>
           </section>
         </div>
 
@@ -167,8 +237,8 @@
           <section class="gw_card__content">
             <div id="mp-enabled-icon" class="card-icon mdi mdi-fan-off"></div>
             <div class="card-icon__form">
-              <div class="gw-textfield mdc-text-field mdc-text-field--outlined mdc-text-field--upgraded mdc-text-field--dense">
-                <input type="number" id="mp-onTime" class="updatable-text mdc-text-field__input" value="10" min="5" max="120" step="5" required>
+              <div class="gw-textfield mdc-text-field mdc-text-field--outlined mdc-text-field--upgraded mdc-text-field--dense mdc-text-field--disabled">
+                <input type="number" id="mp-onTime" class="updatable-text mdc-text-field__input" value="0" min="0" max="120" step="5" required disabled>
                 <label class="mdc-floating-label" for="mp-onTime">Minutes on:</label>
                 <div class="mdc-notched-outline">
                   <svg>
@@ -177,8 +247,8 @@
                 </div>
                 <div class="mdc-notched-outline__idle"></div>
               </div>
-              <div class="gw-textfield mdc-text-field mdc-text-field--outlined mdc-text-field--upgraded mdc-text-field--dense">
-                <input type="number" id="mp-offTime" class="updatable-text mdc-text-field__input" value="10" min="5" max="120" step="5" required>
+              <div class="gw-textfield mdc-text-field mdc-text-field--outlined mdc-text-field--upgraded mdc-text-field--dense mdc-text-field--disabled">
+                <input type="number" id="mp-offTime" class="updatable-text mdc-text-field__input" value="0" min="0" max="120" step="5" required disabled>
                 <label class="mdc-floating-label" for="mp-offTime">Minutes off:</label>
                 <div class="mdc-notched-outline">
                   <svg>
@@ -190,7 +260,7 @@
             </div>
           </section>
           <section class="gw-card__action">
-            <button id="mp-enabled" class="updatable-button mdc-button mdc-button--unelevated">Enable</button>
+            <button id="mp-enabled" class="updatable-button mdc-button mdc-button--unelevated" disabled>Enable</button>
           </section>
         </div>
         
@@ -200,8 +270,8 @@
           <section class="gw_card__content">
             <div id="dp1-enabled-icon" class="card-icon mdi mdi-cup-off"></div>
             <div class="card-icon__text">
-              <div class="gw-textfield mdc-text-field mdc-text-field--outlined mdc-text-field--upgraded mdc-text-field--dense">
-                <input type="number" id="dp1-amount" class="updatable-text mdc-text-field__input" value="100" min="25" max="1000" step="25" required>
+              <div class="gw-textfield mdc-text-field mdc-text-field--outlined mdc-text-field--upgraded mdc-text-field--dense mdc-text-field--disabled">
+                <input type="number" id="dp1-amount" class="updatable-text mdc-text-field__input" value="0" min="0" max="1000" step="25" required disabled>
                 <label class="mdc-floating-label" for="dp1-amount">Dose/wk. (mL):</label>
                 <div class="mdc-notched-outline">
                   <svg>
@@ -213,7 +283,7 @@
             </div>
           </section>
           <section class="gw-card__action">
-            <button id="dp1-enabled" class="updatable-button mdc-button mdc-button--unelevated">Enable</button>
+            <button id="dp1-enabled" class="updatable-button mdc-button mdc-button--unelevated" disabled>Enable</button>
           </section>
         </div>
 
@@ -223,8 +293,8 @@
           <section class="gw_card__content">
             <div id="dp2-enabled-icon" class="card-icon mdi mdi-cup-off"></div>
             <div class="card-icon__text">
-              <div class="gw-textfield mdc-text-field mdc-text-field--outlined mdc-text-field--upgraded mdc-text-field--dense">
-                <input type="number" id="dp2-amount" class="updatable-text mdc-text-field__input" value="100" min="25" max="1000" step="25" required>
+              <div class="gw-textfield mdc-text-field mdc-text-field--outlined mdc-text-field--upgraded mdc-text-field--dense mdc-text-field--disabled">
+                <input type="number" id="dp2-amount" class="updatable-text mdc-text-field__input" value="0" min="0" max="1000" step="25" required disabled>
                 <label class="mdc-floating-label" for="dp2-amount">Dose/wk. (mL):</label>
                 <div class="mdc-notched-outline">
                   <svg>
@@ -236,7 +306,7 @@
             </div>
           </section>
           <section class="gw-card__action">
-            <button id="dp2-enabled" class="updatable-button mdc-button mdc-button--unelevated">Enable</button>
+            <button id="dp2-enabled" class="updatable-button mdc-button mdc-button--unelevated" disabled>Enable</button>
           </section>
         </div>
 
@@ -246,8 +316,8 @@
           <section class="gw_card__content">
             <div class="card-icon mdi mdi-clock-outline"></div>
             <div class="card-icon__text">
-              <div class="gw-textfield mdc-text-field mdc-text-field--outlined mdc-text-field--upgraded mdc-text-field--dense">
-                <input type="text" id="clock" class="updatable-text time mdc-text-field__input" value="04:21" pattern="^([01]\d|2[0-3]):?([0-5]\d)$" minlength="5" maxlength="5" required>
+              <div class="gw-textfield mdc-text-field mdc-text-field--outlined mdc-text-field--upgraded mdc-text-field--dense mdc-text-field--disabled">
+                <input type="text" id="clock" class="updatable-text time mdc-text-field__input" value="00:00" pattern="^([01]\d|2[0-3]):?([0-5]\d)$" minlength="5" maxlength="5" required disabled>
                 <label class="mdc-floating-label" for="clock">Time (24h):</label>
                 <div class="mdc-notched-outline">
                   <svg>
@@ -259,9 +329,10 @@
             </div>
           </section>
         </div>
-
+          
+      </div>
     </div>
-       
+
   </main>
 </body>
 </html>
