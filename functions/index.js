@@ -23,7 +23,6 @@ const REGISTRY = 'gw-registry';
 const API_VERSION = 'v1';
 const DISCOVERY_API = 'https://cloudiot.googleapis.com/$discovery/rest';
 
-
 /**
  * Update Realtime Database with any data that 
  * our pubsbub topic revieces from a gwave unit
@@ -39,46 +38,38 @@ exports.receiveTelemetry = functions.pubsub
     return db.ref(`/devices/${deviceId}`).update(data);
 });
 
-/** Update device configuration when data is written to firebase */
-exports.updateConfig = functions.database.ref('/devices/{deviceId}/{setting}')
-  .onUpdate((change, context) => {
-    
-    if (context.authType === 'USER') {
-      const data = change.after.val();
-      const setting = context.params.setting;
-      const deviceId = context.params.deviceId;
-      const device_name = `projects/${PROJECT_ID}/locations/${REGION}/registries/${REGISTRY}/devices/${deviceId}`;
-
-      var newConfig = new Object();
-      newConfig[setting] = data;
-      newConfig = JSON.stringify(newConfig);
-
-      const binaryData = Buffer.from(newConfig).toString('base64');
-
-      const request = {
-        name: device_name,
-        version_to_update: VERSION,
-        binary_data: binaryData
-      };
-
-      return getIoTClient(serviceAccount, (client) => {
-        client.projects.locations.registries.devices.modifyCloudToDeviceConfig(request,
-          (err, data) => {
-            if (err) {
-              console.log('Could not update config for:', deviceId, 'Message: ', err);
-            } else {
-              console.log('Success :', data);
-            }
-          });
+/** Update device configuration when data is updated on the app */
+exports.updateDeviceConfig = functions.https.onRequest((req, res) => {
+  // Extract update information from request
+  const reqBody = JSON.parse(req.body);
+  const setting = Object.keys(reqBody)[0];
+  const data = reqBody[setting];
+  const deviceId = reqBody["deviceId"];
+  const device_name = `projects/${PROJECT_ID}/locations/${REGION}/registries/${REGISTRY}/devices/${deviceId}`;
+  // Create new configruation
+  var newConfig = new Object();
+  newConfig[setting] = data;
+  newConfig = JSON.stringify(newConfig);
+  const binaryData = Buffer.from(newConfig).toString('base64');
+  // Construct update request for IoT core
+  const request = {
+    name: device_name,
+    version_to_update: VERSION,
+    binary_data: binaryData
+  };
+  // Send device configuration update through IoT Core
+  getIoTClient(serviceAccount, (client) => {
+    client.projects.locations.registries.devices.modifyCloudToDeviceConfig(request,
+      (err, data) => {
+        if (err) {
+          console.log('Message: ', err);
+          res.status(500).send(err);
+        } else {
+          res.status(200).send('Successuly updated device');
+        }
       });
-    } else {
-      // Do nothing
-      console.log("You must be an authenticated user to update a device's configuration");
-      return null;
-    }
-    
   });
-
+});
 
 /**
  * Returns an authorized API client by discovering the Cloud 

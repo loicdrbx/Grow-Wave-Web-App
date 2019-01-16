@@ -33,3 +33,45 @@ exports.updateDeviceConfig = functions.https.onRequest((req, res) => {
 
   return true;
 });
+
+
+// /** Update device configuration when data is written to firebase */
+// exports.updateConfig = functions.database.ref('/devices/{deviceId}/{setting}')
+//   .onUpdate((change, context) => {
+    
+//     if (context.authType === 'USER') {
+//       const data = change.after.val();
+//       const setting = context.params.setting;
+//       const deviceId = context.params.deviceId;
+//       const device_name = `projects/${PROJECT_ID}/locations/${REGION}/registries/${REGISTRY}/devices/${deviceId}`;
+
+//       var newConfig = new Object();
+//       newConfig[setting] = data;
+//       newConfig = JSON.stringify(newConfig);
+
+//       const binaryData = Buffer.from(newConfig).toString('base64');
+
+//       const request = {
+//         name: device_name,
+//         version_to_update: VERSION,
+//         binary_data: binaryData
+//       };
+
+//       return getIoTClient(serviceAccount, (client) => {
+//         client.projects.locations.registries.devices.modifyCloudToDeviceConfig(request,
+//           (err, data) => {
+//             if (err) {
+//               console.log('Could not update config for:', deviceId, 'Message: ', err);
+//             } else {
+//               console.log('Success :', data);
+//             }
+//           });
+//       });
+//     } else {
+//       // Do nothing
+//       // Only authentificated 
+//       console.log("You must be an authenticated user to update a device's configuration");
+//       return null;
+//     }
+    
+//   });
