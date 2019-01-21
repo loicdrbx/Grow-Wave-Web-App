@@ -3806,6 +3806,9 @@ html, body {
   padding: var(--mdc-layout-grid-margin-tablet, 16px);
   max-width: 840px; }
 
+.mdc-dialog {
+  z-index: auto !important; }
+
 .mdc-dialog__surface {
   border-radius: 15px; }
 
@@ -4037,7 +4040,7 @@ html, body {
   margin-top: 20px;
   width: 170px; }
 
-#add-unit, #delete-unit {
+#add-unit__dashboard, #delete-unit {
   width: 170px; }
 
 #delete-unit {

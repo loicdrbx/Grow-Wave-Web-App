@@ -482,7 +482,6 @@ document.querySelectorAll('.updatable-text').forEach(function(textField) {
     var isValid = validateInput(val, textField.id)
     // Special case for time objects
     if (elemClass[1] == "time") {
-      console.log(val);
       val = checkAndConvertTime(val);
       isValid = val != null;
     }
@@ -493,6 +492,8 @@ document.querySelectorAll('.updatable-text').forEach(function(textField) {
       deviceRef.update(newData)
       .then(function() {
         // console.log(textField.id + " set to " + val);
+        // Update Grow Wave unit
+        updateDeviceConfig(newData);
       }).catch(function() {
         // console.log("Got an error: ", error);
       });
@@ -513,8 +514,31 @@ document.querySelectorAll('.updatable-button').forEach(function(button) {
     deviceRef.update(newData)
     .then(function() {
       // console.log(button.id + " set to " + val);
+      // Update Grow Wave unit
+      updateDeviceConfig(newData);
     }).catch(function() {
       // console.log("Got an error: ", error);
     });
   });
 });
+
+// Makes HTTP request to cloud functions to update Grow Wave device configuration
+function updateDeviceConfig(data) {
+  // Device ID and function url required for request
+  data["deviceId"] = userUnits[userDefaultUnit];
+  const url = 'https://us-central1-grow-wave.cloudfunctions.net/updateDeviceConfig';
+  // Call to fetch API to make request
+  fetch(url, {
+    method: 'POST',  
+    body: JSON.stringify(data),
+    mode: 'no-cors',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+  .then(function(response) {
+    // console.log('Success:', JSON.stringify(response));
+  }).catch(function(error) {
+    // console.log("Got an error: ", error);
+  });
+}

@@ -3492,17 +3492,17 @@ var _dialog = __webpack_require__(32);
 
 var _textfield = __webpack_require__(38);
 
+var _notchedOutline = __webpack_require__(11);
+
 var _helperText = __webpack_require__(18);
 
 var _lineRipple = __webpack_require__(10);
-
-var _notchedOutline = __webpack_require__(11);
 
 var _snackbar = __webpack_require__(48);
 
 var _select = __webpack_require__(50);
 
-/** Instantiation of necessary Material Web Components */
+/** Instantiate necessary Material Web Components */
 var topAppBarElement = document.querySelector('.mdc-top-app-bar'); /** Import necessary Material Web Components */
 
 var topAppBar = new _index.MDCTopAppBar(topAppBarElement);
@@ -3529,45 +3529,70 @@ var notchedOutlines = document.querySelectorAll('.mdc-notched-outline');
 notchedOutlines.forEach(function (notchedOutline) {
   var n = new _notchedOutline.MDCNotchedOutline(notchedOutline);
 });
-var select = new _select.MDCSelect(document.querySelector('.mdc-select'));
+var select = new _select.MDCSelect(document.querySelector('.mdc-select')); // TODO: Replace multiple selects assignments with this one
 var notificationSnackbar = new _snackbar.MDCSnackbar(document.querySelector('#gw-notification-snackbar'));
 
-/** Monitor user authentification status */
+/** Global variables */
 
-var userId = null;
+var userId;
 var userUnits = [];
 var userDefaultUnit;
 
+var db = firebase.database();
+var usersRef;
+var deviceRef;
+
+/** Monitor user authentification status */
+
 firebase.auth().onAuthStateChanged(function (user) {
   // If auth change is a sign-in
+  // Save credentials and load dashboard
   if (user && user.uid != userId) {
-    userId = user.uid; // save userID
-    handleUserSignIn(user); // handle user
+    userId = user.uid;
+    usersRef = db.ref('users/' + userId);
+    displayUserInfo(user);
     loadDashboard();
-    // console.log("New login from:", user.displayName);
   } else {
-    // Auth change is a sign-out
-    userId = null; // reset userID
-    window.location.replace("index.html"); // redirect to landing page
+    // If auth change is a sign-out or delete
+    // Reset credentials and redirect to landing page
+    userId = null;
+    window.location.replace('index.html');
   }
 });
 
-/** User authentification helper functions */
+/** Loads and runs the dashboard when a user logs in */
 
-// Handle a signed in user
-function handleUserSignIn(user) {
-
-  // If user is new, add them to the database
-  firebase.database().ref('users/' + userId).once('value', function (snapshot) {
-    if (!snapshot.exists()) {
-      firebase.database().ref('users/' + userId).set({
-        // units: [''],
-        defaultUnit: ''
+function loadDashboard() {
+  // Search database for user's data
+  usersRef.once('value', function (snapshot) {
+    // If they have no data
+    // prompt them to add a unit
+    if (snapshot.val() == null) {
+      notifyUser("Welcome! Add a Growwave unit to get started.");
+    } else {
+      // If they have data
+      // Sync and obtain references to it
+      userUnits = snapshot.val().units;
+      userDefaultUnit = snapshot.val().defaultUnit;
+      deviceRef = db.ref('devices/' + userUnits[userDefaultUnit]);
+      // Enable dashboard inputs
+      enableInputs();
+      // Initialise dashboard fields
+      deviceRef.once('value', function (snapshot) {
+        initialiseDashboard(snapshot);
+      });
+      // Sync dashboard with database
+      deviceRef.on('child_changed', function (snapshot) {
+        syncDashboard(snapshot);
       });
     }
   });
+}
 
-  // Display user's name and photo on toolbar
+/** Dashboard functions */
+
+// Displays the user's name and photo on toolbar
+function displayUserInfo(user) {
   document.querySelector('.gw-username').textContent = user.displayName;
   if (user.photoURL) {
     var photoURL = user.photoURL;
@@ -3583,182 +3608,60 @@ function handleUserSignIn(user) {
   }
 }
 
-// Monitor sign-out button
-document.getElementById('sign-out').addEventListener('click', function () {
-  firebase.auth().signOut(); // sign user out
-});
-
-// Monitor delete-account button
-document.getElementById('delete-account').addEventListener('click', function () {
-  deleteAccount();
-});
-
-// Delete the user's account and information
-function deleteAccount() {
-
-  var tempId = userId;
-  var deleteError = false;
-
-  // Delete acccount
-  firebase.auth().currentUser.delete().catch(function (error) {
-    if (error.code == 'auth/requires-recent-login') {
-      deleteError = true;
-      // The user's credential is too old. They need to sign in again.
-      firebase.auth().signOut().then(function () {
-        // The timeout allows the message to be displayed after the UI has
-        // changed to the signed out state.
-        setTimeout(function () {
-          alert('Please sign in again to delete your account.');
-        }, 1);
-      });
-    }
-  });
-
-  // Delete user information only after their account is deleted
-  if (!deleteError) {
-    firebase.database().ref('users/' + tempId).remove();
+// Keep dashboard in sycn with any database side changes
+function syncDashboard(snapshot) {
+  // Obtain the key and value of any changed data
+  var key = snapshot.key.toString();
+  var data = snapshot.val();
+  // Obtain the html element related to the key
+  var elem = document.getElementById(key);
+  // Determine the type of the html element
+  var elemClass = elem.className.split(" ");
+  // If html element is a button  
+  if (elemClass[0] == "updatable-button") {
+    // Toggle the text and icon according to 
+    // the the boolean value of data
+    elem.innerText = data ? "DISABLE" : "ENABLE";
+    toggleIconInit(elem, data);
   }
-};
-
-/** Loads and runs dashboard while user is logged in */
-
-function loadDashboard() {
-
-  // Get a reference to the database
-  var db = firebase.database();
-  // Create references to frequently used paths
-  var deviceRef = db.ref('devices/esp32_1D3438');
-  var usersRef = db.ref('users/' + userId);
-
-  // Sync user information to the latest data when app opens
-  usersRef.once('value', function (snapshot) {
-
-    if (snapshot.val() == null) {
-
-      notifyUser("Welcome! Add a Growwave unit to get started.");
-    } else if (snapshot.val().units == undefined) {
-
-      notifyUser("Add a Growwave unit to get started.");
-    } else {
-
-      console.log(snapshot.val());
-      userUnits = snapshot.val().units;
-      userDefaultUnit = snapshot.val().defaultUnit;
-      var select = document.getElementById("unit-select");
-
-      // Populate unit select dropdown
-      for (var i = 0; i < userUnits.length; i++) {
-        var option = document.createElement("option");
-        option.value = i;
-        option.innerHTML = userUnits[i];
-        select.appendChild(option);
-      }
-
-      // Select user's default unit
-      select.value = userDefaultUnit;
-      select.focus(); // successive focus and blur
-      select.blur(); // to fix UI glitch
-
-      // Enable dashboard fields
-      enableFields();
+  // If html element is a textfield
+  if (elemClass[0] == "updatable-text") {
+    // Format the data according to the type of textfield
+    switch (elemClass[1]) {
+      case "time":
+        data = minutesToTime(data);
+        elem.value = data;
+        break;
+      case "tmp":
+        elem.innerText = data += "°C";
+        break;
+      case "pH":
+        elem.innerHTML = data;
+        break;
+      default:
+        elem.value = data;
     }
-  });
+  }
+}
 
-  // Sync dashboard to latest unit data when app opens
-  deviceRef.once('value', function (snapshot) {
-
-    snapshot.forEach(function (childSnapshot) {
-
-      var key = childSnapshot.key;
-      var data = childSnapshot.val();
-      var elem = document.getElementById(key);
-      var elemClass = elem.className.split(" ");
-
-      if (elemClass[0] == "updatable-text") {
-        switch (elemClass[1]) {
-          case "time":
-            data = minutesToTime(data);
-            elem.value = data;
-            break;
-          case "tmp":
-            elem.innerText = data += "°C";
-            break;
-          case "pH":
-            elem.innerHTML = data;
-            break;
-          default:
-            elem.value = data;
-        }
-        // console.log("Updated " + key + " to " + data);
-      }
-
-      if (elemClass[0] == "updatable-button") {
-        elem.innerText = data ? "DISABLE" : "ENABLE";
-        toggleIconInit(elem, data);
-      }
-    });
-  });
-
-  // Monitor enable/disable buttons for clicks
-  document.querySelectorAll('.updatable-button').forEach(function (button) {
-    button.addEventListener('click', function () {
-      // Toggle button text and icon
-      var val = button.innerText == "ENABLE" ? true : false;
-      button.innerText = val ? "DISABLE" : "ENABLE";
-      toggleIcon(button);
-      // Commit change to database
-      var newData = new Object();
-      newData[button.id] = val;
-      deviceRef.update(newData).then(function () {
-        console.log(button.id + " set to " + val);
-      }).catch(function () {
-        console.log("Got an error: ", error);
-      });
-    });
-  });
-
-  // Monitor updatable textfields for changes
-  document.querySelectorAll('.updatable-text').forEach(function (textField) {
-    textField.addEventListener('change', function () {
-      var elem = document.getElementById(textField.id);
-      var elemClass = elem.className.split(" ");
-      var val = this.value;
-      var isValid = validateInput(val, textField.id);
-      // Special case for time objects
-      if (elemClass[1] == "time") {
-        console.log(val);
-        val = checkAndConvertTime(val);
-        isValid = val != null;
-      }
-      // Commit change to database if data is valid
-      if (isValid) {
-        var newData = new Object();
-        newData[textField.id] = +val;
-        deviceRef.update(newData).then(function () {
-          console.log(textField.id + " set to " + val);
-        }).catch(function () {
-          console.log("Got an error: ", error);
-        });
-      }
-    });
-  });
-
-  // Monitor any database side changes
-  // and update UI accordingly
-  deviceRef.on('child_changed', function (snapshot) {
-
-    var key = snapshot.key.toString();
-    var data = snapshot.val();
+// Initialise dashboard when app opens
+function initialiseDashboard(snapshot) {
+  // Initialise unit-select dropdown
+  populateSelect();
+  // Get a snaphots of the unit's data
+  // and update dashboard fields
+  snapshot.forEach(function (childSnapshot) {
+    // Iterate over each key-value pair
+    // and obtain the key and value
+    var key = childSnapshot.key;
+    var data = childSnapshot.val();
+    // Obtain the html element related to the key
     var elem = document.getElementById(key);
+    // Determine the type of the html element
     var elemClass = elem.className.split(" ");
-
-    if (elemClass[0] == "updatable-button") {
-      elem.innerText = data ? "DISABLE" : "ENABLE";
-      toggleIconInit(elem, data);
-      // console.log("Updated " + key + " to " + data);
-    }
-
+    // If html element is a textfield
     if (elemClass[0] == "updatable-text") {
+      // Format the data according to the type of textfield
       switch (elemClass[1]) {
         case "time":
           data = minutesToTime(data);
@@ -3773,119 +3676,143 @@ function loadDashboard() {
         default:
           elem.value = data;
       }
-      // console.log("Updated " + key + " to " + data);
     }
-  });
-
-  // Monitor changes in unit select dropdown
-  // and update database accordingly
-  document.getElementById('unit-select').addEventListener('change', function (evt) {
-    usersRef.child("defaultUnit").set(this.value);
-  });
-
-  // Monitor unit delete button
-  // The current default unit will be deleted
-  document.getElementById('delete-unit').addEventListener('click', function (evt) {
-
-    if (userUnits.length == 0) {
-
-      // Notify user that there are no units to delete
-      notifyUser("There are no units to delete.");
-    } else {
-
-      // Make user confirm delete decision
-      if (window.confirm("Are you sure you want to delete this unit?")) {
-        // Delete unit from units array
-        var deletedUnit = userUnits.splice(userDefaultUnit, 1);
-        // Update html
-        var select = document.getElementById("unit-select");
-        select.remove(userDefaultUnit);
-        // Update firebase
-        userDefaultUnit = 0;
-        usersRef.child("units").set(userUnits);
-        usersRef.child("defaultUnit").set(userDefaultUnit);
-      }
-
-      // Notify user of deletion
-      notifyUser(deletedUnit[0] + " has been deleted.");
-
-      // User has deleted all fields, disable fields
-      if (userUnits.length == 0) {
-        disableFields();
-      }
+    // If html element is a button
+    if (elemClass[0] == "updatable-button") {
+      // Toggle the text and icon according to 
+      // the the boolean value of data
+      elem.innerText = data ? "DISABLE" : "ENABLE";
+      toggleIconInit(elem, data);
     }
-  });
-
-  // Monitor add unit button (the one that validates input)
-  document.getElementById('add-unit-2').addEventListener('click', function (evt) {
-
-    var newUnitTextfield = document.getElementById('add-unit-id');
-    var select = document.getElementById("unit-select");
-    var newUnitId = document.getElementById('add-unit-id').value;
-    var unitHelper = document.getElementById('gw-unit-helper');
-    var nicknameHelper = document.getElementById('gw-nickname-helper');
-
-    // Validate unit Id
-    firebase.database().ref('devices/' + newUnitId).once('value', function (snapshot) {
-
-      if (snapshot.exists()) {
-
-        if (userUnits.includes(newUnitId)) {
-          // Unit is already added
-          notifyUser(newUnitId + " is already added.");
-        } else {
-          // Add new Unit to user's profile
-          userUnits.push(newUnitId);
-          usersRef.child("units").set(userUnits);
-          // Update select
-          var option = document.createElement("option");
-          option.value = userUnits.length;
-          option.innerHTML = newUnitId;
-          select.appendChild(option);
-          // Notify user of unit addition
-          notifyUser(newUnitId + " has been added.");
-          // Enable Fields
-          enableFields();
-          // Close Dialog
-          addUnitDialog.close();
-        }
-      } else {
-        // Unit Id does not exist. Notify user.
-        notifyUser(newUnitId + " is not a valid unit ID.");
-      }
-    });
   });
 }
 
-/** Dashboard Helper functions */
+/** Dashboard helper functions */
+
+// Displays a snackbar containing
+// a notification for the user
+function notifyUser(message) {
+  var dataObj = {
+    message: message
+  };
+  notificationSnackbar.show(dataObj);
+}
+
+// Populates the unit-select dropwdown
+function populateSelect() {
+  var select = document.getElementById('unit-select');
+  // Create an option for every unit in the userUnits list
+  for (var i = 0; i < userUnits.length; i++) {
+    var option = document.createElement("option");
+    option.value = i;
+    option.innerHTML = userUnits[i];
+    if (!select.options.item(option.value)) {
+      // Append option to select only if it is not already there
+      // Prevents the creation of duplicate options
+      select.appendChild(option);
+    }
+  }
+  // Select user's default unit
+  select.selectedIndex = userDefaultUnit;
+  select.focus(); // successive focus and blur
+  select.blur(); // to fix UI glitch
+}
+
+// Enables all dashboard inputs
+function enableInputs() {
+  // Enable dashboard textfields
+  var textfields = document.querySelectorAll('.gw-textfield');
+  textfields.forEach(function (textfield) {
+    textfield.classList.remove('mdc-text-field--disabled');
+  });
+  var inputs = document.querySelectorAll('.updatable-text');
+  inputs.forEach(function (input) {
+    input.removeAttribute('disabled');
+  });
+  // Enable dashboard buttons
+  var buttons = document.querySelectorAll('.updatable-button');
+  buttons.forEach(function (button) {
+    button.removeAttribute('disabled');
+  });
+}
+
+// Disables all dashboard inputs
+function disableInputs() {
+  // Disable dashboard textfields
+  var textfields = document.querySelectorAll('.gw-textfield');
+  textfields.forEach(function (textfield) {
+    textfield.classList.add('mdc-text-field--disabled');
+  });
+  var inputs = document.querySelectorAll('.updatable-text');
+  inputs.forEach(function (input) {
+    input.setAttribute('disabled', 'disabled');
+  });
+  var labels = document.querySelectorAll('mdc-floating-label');
+  labels.forEach(function (label) {
+    label.removeAttribute('mdc-floating-label--float-above');
+  });
+  // Disable dashboard buttons
+  var buttons = document.querySelectorAll('.updatable-button');
+  buttons.forEach(function (button) {
+    button.setAttribute('disabled', 'disabled');
+  });
+}
 
 // Toggles the icon associated with a given
 // HTML element from one state to another
 function toggleIcon(elem) {
-
+  // Identify the icon related to the given element
   var iconElem = document.getElementById(elem.id + "-icon");
+  // Obtain the icon's class name
   var iconClass = iconElem.className;
-
-  // Special case for grow lights
+  // If the class name is that of an led (for the grow lights card)
   if (iconClass.indexOf("mdi-led") > -1) {
+    // Toggle between the on and off led icons
     iconElem.className = iconClass.indexOf("off") > -1 ? "card-icon mdi mdi-led-on" : "card-icon mdi mdi-led-variant-off";
-  } // Every other case (-off is the only change is className)
-  else if (iconClass.indexOf("off") > -1) {
-      iconElem.className = iconClass.slice(0, -4);
-    } else {
-      iconElem.className = iconClass += "-off";
-    }
+  } else if (iconClass.indexOf("off") > -1) {
+    // If the icon class name contains "-off"
+    // Trim it off
+    iconElem.className = iconClass.slice(0, -4);
+  } else {
+    // The icon class is not that of an led and is on
+    // Modify the class to the off variant
+    iconElem.className = iconClass += "-off";
+  }
 }
 
-// Overloaded version of toggleIcon() used when app opens 
+// Toggles the icon associated with a given
+// HTML element from one state to another
+// (used when app opens) 
 function toggleIconInit(elem, data) {
-
+  // Identify the icon related to the given element
   var iconElem = document.getElementById(elem.id + "-icon");
+  // Obtain the icon's class name
   var iconClass = iconElem.className;
-
-  // call toggleIcon() only if icon and button text don't match
+  // call toggleIcon() only if icon and boolean value of data don't match
+  // Ex: if lts-enabled is true, the icon must be the "on" variant
   if (iconClass.indexOf("off") > -1 && data || iconClass.indexOf("off") < 0 && !data) {
     toggleIcon(elem);
+  }
+}
+
+// Returns true if val is a valid input for 
+// its text-field type and false otherwise
+function validateInput(val, textType) {
+  switch (textType) {
+    case "dp1-amount":
+      return (/^[0-9]+$/.test(val) && val >= 25 && val <= 1000
+      );
+    case "dp2-amount":
+      return (/^[0-9]+$/.test(val) && val >= 25 && val <= 1000
+      );
+    case "mp-offTime":
+      return (/^[0-9]+$/.test(val) && val >= 5 && val <= 120
+      );
+    case "mp-onTime":
+      return (/^[0-9]+$/.test(val) && val >= 5 && val <= 120
+      );
+    default:
+      return false;
   }
 }
 
@@ -3908,7 +3835,6 @@ function minutesToTime(minutes) {
 // the total amount of minutes if valid (ex: "16:00" -> 960) and null
 // otherwise
 function checkAndConvertTime(timeString) {
-
   var minutes = null;
   // Check that input is a valid hh:mm
   var isValid = /^([01]\d|2[0-3]):?([0-5]\d)$/.test(timeString);
@@ -3917,85 +3843,191 @@ function checkAndConvertTime(timeString) {
     var half = timeString.split(":");
     minutes = +half[0] * 60 + +half[1];
   }
-
   return minutes;
 }
 
-// Returns true if val is a valid input for 
-// its text-field type and false otherwise
-function validateInput(val, textType) {
+/** Event Listeners for user inputs */
 
-  switch (textType) {
-
-    case "dp1-amount":
-      return (/^[0-9]+$/.test(val) && val >= 25 && val <= 1000
-      );
-    case "dp2-amount":
-      return (/^[0-9]+$/.test(val) && val >= 25 && val <= 1000
-      );
-    case "mp-offTime":
-      return (/^[0-9]+$/.test(val) && val >= 5 && val <= 120
-      );
-    case "mp-onTime":
-      return (/^[0-9]+$/.test(val) && val >= 5 && val <= 120
-      );
-    default:
-      return false;
-  }
-}
-
-/** Miscellaneous Functioons */
-
-document.getElementById('gw-menu').addEventListener('click', function (evt) {
-  menuDialog.lastFocusedTarget = evt.target;
-  menuDialog.show();
+// Monitor changes in unit select dropdown
+document.getElementById('unit-select').addEventListener('change', function (evt) {
+  // update default unit to the one that vas selected
+  userDefaultUnit = this.value;
+  usersRef.child("defaultUnit").set(userDefaultUnit);
+  // reload dashboard
+  loadDashboard();
 });
 
-document.getElementById('add-unit').addEventListener('click', function (evt) {
+// Monitor add unit button (the dashboard one) for clicks
+document.getElementById('add-unit__dashboard').addEventListener('click', function (evt) {
+  // Display add-unit dialog
   addUnitDialog.lastFocusedTarget = evt.target;
   addUnitDialog.show();
 });
 
-function notifyUser(message) {
-  var dataObj = {
-    message: message
-  };
-  notificationSnackbar.show(dataObj);
-}
+// Monitor add unit button (the dialog one) for clicks
+document.getElementById('add-unit__dialog').addEventListener('click', function (evt) {
+  var newUnitId = document.getElementById('add-unit-id').value;
+  // Validate unit ID
+  // TODO: Improve validation. There is a bug where "/" and other chars get through
+  db.ref('devices/' + newUnitId).once('value', function (snapshot) {
+    // If unit if registered in the database
+    if (snapshot.exists()) {
+      if (userUnits.includes(newUnitId)) {
+        // Notify user if unit is already added
+        notifyUser(newUnitId + " is already added.");
+      } else {
+        // Add new unit to user's account
+        userDefaultUnit = userUnits.push(newUnitId) - 1;
+        usersRef.child("units").set(userUnits);
+        usersRef.child("defaultUnit").set(userDefaultUnit);
+        // Update unit-select dropdown
+        populateSelect();
+        // Notify user of unit addition
+        notifyUser(newUnitId + " has been added.");
+        // Update deviceRef 
+        deviceRef = db.ref('devices/' + newUnitId);
+        // Close add-unit dialog and relaod dashboard
+        addUnitDialog.close();
+        loadDashboard();
+      }
+    } else {
+      // If unit ID does not exist, notify the user.
+      notifyUser(newUnitId + " is not a valid unit ID.");
+    }
+  });
+});
 
-function enableFields() {
-  // Enable dashboard fields
-  var textfields = document.querySelectorAll('.gw-textfield');
-  textfields.forEach(function (textfield) {
-    textfield.classList.remove('mdc-text-field--disabled');
-  });
-  var inputs = document.querySelectorAll('.updatable-text');
-  inputs.forEach(function (input) {
-    input.removeAttribute('disabled');
-  });
+// Monitor the delete-unit button for clicks
+document.getElementById('delete-unit').addEventListener('click', function (evt) {
+  // If there are no units stored
+  if (userUnits.length == 0) {
+    // Notify user that there are no units to delete
+    notifyUser("There are no units to delete.");
+  } else {
+    // Make user confirm delete decision
+    // TODO: implement a dialog instead of using an alert
+    if (window.confirm("Are you sure you want to delete this unit?")) {
+      // Delete the selected unit (userDefaultUnit) from the units array
+      var deletedUnit = userUnits.splice(userDefaultUnit, 1);
+      // Update the unit-select dropdown
+      var select = document.getElementById("unit-select");
+      select.remove(userDefaultUnit);
+      // Set new default unit as unit 0 or null if the select is empty
+      userDefaultUnit = select.options.item(0) ? 0 : null;
+      // Update the database
+      usersRef.child("units").set(userUnits);
+      usersRef.child("defaultUnit").set(userDefaultUnit);
+      // Notify user of the deletion
+      notifyUser(deletedUnit[0] + " has been deleted.");
+      // If user has no more units, disable the dashboard
+      if (userUnits.length == 0) {
+        disableInputs();
+        deviceRef.off();
+        window.location.reload(); // Reload to force dummy values. TODO: find a better way
+      } else {
+        // Switch device reference to default unit and reload dashboard
+        deviceRef = db.ref('devices' + userUnits[userDefaultUnit]);
+        loadDashboard();
+      }
+    }
+  }
+});
 
-  // Enable dashboard fields
-  var buttons = document.querySelectorAll('.updatable-button');
-  buttons.forEach(function (button) {
-    button.removeAttribute('disabled');
-  });
-}
+// Monitor menu button for clicks
+document.getElementById('gw-menu').addEventListener('click', function (evt) {
+  // Display menu dialog
+  menuDialog.lastFocusedTarget = evt.target;
+  menuDialog.show();
+});
 
-function disableFields() {
-  // Enable dashboard fields
-  var textfields = document.querySelectorAll('.gw-textfield');
-  textfields.forEach(function (textfield) {
-    textfield.classList.add('mdc-text-field--disabled');
-  });
-  var inputs = document.querySelectorAll('.updatable-text');
-  inputs.forEach(function (input) {
-    input.setAttribute('disabled', 'disabled');
-  });
+// Monitor sign-out button for clicksF
+document.getElementById('sign-out').addEventListener('click', function () {
+  firebase.auth().signOut(); // sign user out
+});
 
-  // Enable dashboard fields
-  var buttons = document.querySelectorAll('.updatable-button');
-  buttons.forEach(function (button) {
-    button.setAttribute('disabled', 'disabled');
+// Monitor delete-account button for clicks
+document.getElementById('delete-account').addEventListener('click', function () {
+  // Attempt to delete the user's account
+  firebase.auth().currentUser.delete().catch(function (error) {
+    // If the user's credentials are too old. They need to sign in again.
+    if (error.code == 'auth/requires-recent-login') {
+      firebase.auth().signOut().then(function () {
+        // The timeout allows the message to be displayed after the UI has
+        // changed to the signed out state.
+        setTimeout(function () {
+          alert('Please sign in again to delete your account.');
+        }, 1);
+      });
+    }
+  });
+  // TODO: Make user confirm deletion before deleting their account
+  // TODO: Figure out how to delete user's information when their account gets deleted
+});
+
+// Monitor updatable textfields for changes
+document.querySelectorAll('.updatable-text').forEach(function (textField) {
+  textField.addEventListener('change', function () {
+    var elem = document.getElementById(textField.id);
+    var elemClass = elem.className.split(" ");
+    var val = this.value;
+    var isValid = validateInput(val, textField.id);
+    // Special case for time objects
+    if (elemClass[1] == "time") {
+      val = checkAndConvertTime(val);
+      isValid = val != null;
+    }
+    // Commit change to database if data is valid
+    if (isValid) {
+      var newData = new Object();
+      newData[textField.id] = +val;
+      deviceRef.update(newData).then(function () {
+        // console.log(textField.id + " set to " + val);
+        // Update Grow Wave unit
+        updateDeviceConfig(newData);
+      }).catch(function () {
+        // console.log("Got an error: ", error);
+      });
+    }
+  });
+});
+
+// Monitor enable/disable buttons for clicks
+document.querySelectorAll('.updatable-button').forEach(function (button) {
+  button.addEventListener('click', function () {
+    // Toggle button text and icon
+    var val = button.innerText == "ENABLE" ? true : false;
+    button.innerText = val ? "DISABLE" : "ENABLE";
+    toggleIcon(button);
+    // Commit change to database
+    var newData = new Object();
+    newData[button.id] = val;
+    deviceRef.update(newData).then(function () {
+      // console.log(button.id + " set to " + val);
+      // Update Grow Wave unit
+      updateDeviceConfig(newData);
+    }).catch(function () {
+      // console.log("Got an error: ", error);
+    });
+  });
+});
+
+// Makes HTTP request to cloud functions to update Grow Wave device configuration
+function updateDeviceConfig(data) {
+  // Device ID and function url required for request
+  data["deviceId"] = userUnits[userDefaultUnit];
+  var url = 'https://us-central1-grow-wave.cloudfunctions.net/updateDeviceConfig';
+  // Call to fetch API to make request
+  fetch(url, {
+    method: 'POST',
+    body: JSON.stringify(data),
+    mode: 'no-cors',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  }).then(function (response) {
+    // console.log('Success:', JSON.stringify(response));
+  }).catch(function (error) {
+    // console.log("Got an error: ", error);
   });
 }
 
