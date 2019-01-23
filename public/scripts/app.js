@@ -41,8 +41,9 @@ const notificationSnackbar = new MDCSnackbar(document.querySelector('#gw-notific
 /** Global variables */
 
 var userId; 
-var userUnits = [];
+var userUnits = {};
 var userDefaultUnit;
+
 
 const db = firebase.database();
 var usersRef;
@@ -80,7 +81,7 @@ function loadDashboard() {
       // Sync and obtain references to it
       userUnits = snapshot.val().units;
       userDefaultUnit = snapshot.val().defaultUnit;
-      deviceRef = db.ref('devices/' + userUnits[userDefaultUnit]);
+      deviceRef = db.ref('devices/' + userDefaultUnit);
       // Enable dashboard inputs
       enableInputs();
       // Initialise dashboard fields
@@ -211,18 +212,20 @@ function notifyUser(message) {
 function populateSelect() {
   var select = document.getElementById('unit-select');
   // Create an option for every unit in the userUnits list
-  for (var i = 0; i < userUnits.length; i++) {
+  var i = 0;
+  Object.keys(userUnits).forEach(function(key) {
     var option = document.createElement("option");
     option.value = i;
-    option.innerHTML = userUnits[i];
+    option.innerHTML = userUnits[key].nickname;
     if (!select.options.item(option.value)) {
       // Append option to select only if it is not already there
       // Prevents the creation of duplicate options
       select.appendChild(option);
     }
-  }
+    i++;
+  });
   // Select user's default unit
-  select.selectedIndex = userDefaultUnit;
+  select.selectedIndex = Object.keys(userUnits).indexOf(userDefaultUnit);
   select.focus(); // successive focus and blur
   select.blur();  // to fix UI glitch
 }
@@ -327,7 +330,6 @@ function validateInput(val, textType) {
 // Converts number of minutes to a string representing
 // time in hours and minutes (ex: 45 -> "00:45", 960 -> "16:00")
 function minutesToTime(minutes) {
-  
   var hrs = Math.floor(minutes / 60);
   hrs = ("0" + hrs).slice(-2); // formats 1 hr to 01 hr
   var mins = minutes % 60;
@@ -359,7 +361,7 @@ function checkAndConvertTime(timeString) {
 // Monitor changes in unit select dropdown
 document.getElementById('unit-select').addEventListener('change', function (evt) {
   // update default unit to the one that vas selected
-  userDefaultUnit = this.value;
+  userDefaultUnit = Object.keys(userUnits)[this.value];
   usersRef.child("defaultUnit").set(userDefaultUnit);
   // reload dashboard
   loadDashboard()
@@ -367,25 +369,34 @@ document.getElementById('unit-select').addEventListener('change', function (evt)
 
 // Monitor add unit button (the dashboard one) for clicks
 document.getElementById('add-unit__dashboard').addEventListener('click', function (evt) {
+  // Reset fields in add-unit dialog
+  document.getElementById('add-unit-id').value = "";
+  document.getElementById('add-unit-nickname').value = getNickname();
   // Display add-unit dialog
   addUnitDialog.lastFocusedTarget = evt.target;
   addUnitDialog.show();
 });
 
+
 // Monitor add unit button (the dialog one) for clicks
 document.getElementById('add-unit__dialog').addEventListener('click', function (evt) {
+
+  // Obtain and parse information from dialog
   var newUnitId = document.getElementById('add-unit-id').value;
+  var newUnitName = document.getElementById('add-unit-nickname').value  || newUnitId;
+
   // Validate unit ID
   // TODO: Improve validation. There is a bug where "/" and other chars get through
   db.ref('devices/' + newUnitId).once('value', function(snapshot) {
-    // If unit if registered in the database
-    if (snapshot.exists()) {
-      if (userUnits.includes(newUnitId)) {
+    // If unit if registered in the database  
+    if (snapshot.exists() && newUnitId !== "") {
+      if (userUnits.hasOwnProperty(newUnitId)) {
         // Notify user if unit is already added
         notifyUser(newUnitId + " is already added.");
       } else {
         // Add new unit to user's account
-        userDefaultUnit = userUnits.push(newUnitId) - 1;
+        userDefaultUnit = newUnitName;
+        userUnits[newUnitId] = {"nickname" : newUnitName};
         usersRef.child("units").set(userUnits);
         usersRef.child("defaultUnit").set(userDefaultUnit);
         // Update unit-select dropdown
@@ -398,44 +409,47 @@ document.getElementById('add-unit__dialog').addEventListener('click', function (
         addUnitDialog.close();
         loadDashboard();
       }
+    } else if (newUnitId === "") {
+      // If unit ID is blank, notify the user
+      notifyUser("The unit ID field may not be blank.");
     } else {
       // If unit ID does not exist, notify the user.
       notifyUser(newUnitId + " is not a valid unit ID.");      
     }
   });
-
 });
 
 // Monitor the delete-unit button for clicks
 document.getElementById('delete-unit').addEventListener('click', function (evt) {
   // If there are no units stored
-  if (userUnits.length == 0) {
+  if (Object.keys(userUnits).length === 0) {
     // Notify user that there are no units to delete
     notifyUser("There are no units to delete.");    
   } else {
     // Make user confirm delete decision
     // TODO: implement a dialog instead of using an alert
     if (window.confirm("Are you sure you want to delete this unit?")) {
-      // Delete the selected unit (userDefaultUnit) from the units array
-      var deletedUnit = userUnits.splice(userDefaultUnit, 1);
       // Update the unit-select dropdown
       var select = document.getElementById("unit-select");
-      select.remove(userDefaultUnit);
+      select.remove(Object.keys(userUnits).indexOf(userDefaultUnit));
+      // Delete the selected unit (userDefaultUnit) from the units array
+      var deletedUnit = userDefaultUnit;
+      delete userUnits[userDefaultUnit];
       // Set new default unit as unit 0 or null if the select is empty
-      userDefaultUnit = select.options.item(0) ? 0 : null;
+      userDefaultUnit = select.options.item(0) ? Object.keys(userUnits)[0] : null;
       // Update the database
       usersRef.child("units").set(userUnits);
       usersRef.child("defaultUnit").set(userDefaultUnit);      
       // Notify user of the deletion
-      notifyUser(deletedUnit[0] + " has been deleted.");
+      notifyUser(deletedUnit + " has been deleted.");
       // If user has no more units, disable the dashboard
-      if (userUnits.length == 0) {
+      if (Object.keys(userUnits).length === 0) {
         disableInputs();
         deviceRef.off()
-        window.location.reload(); // Reload to force dummy values. TODO: find a better way
+        window.location.reload(); // Reload to force dummy values into dashboard. TODO: find a better way
       } else {
         // Switch device reference to default unit and reload dashboard
-        deviceRef = db.ref('devices' + userUnits[userDefaultUnit]);
+        deviceRef = db.ref('devices' + userDefaultUnit);
         loadDashboard();
       }
     }
@@ -541,4 +555,11 @@ function updateDeviceConfig(data) {
   }).catch(function(error) {
     // console.log("Got an error: ", error);
   });
+}
+
+// Generates random unit nicknames
+function getNickname() {
+  var names = ["You Grow Girl!","Encourage-Mints","AloeYouVeraMuch","PartyThyme","WoodYouBeMine?","Tree O’clock","RomaineCalm","Mint To Be","Uno Moss","Unbeleafable","Leaf of Faith","RootingForYou!","IWetMyPlants","PricklyPear","Lookin' Sharp","PrickleMyFancy","sucCUTElent","Plantastic24","GoodChivesOnly","Lettuce123","LongThymeNoSee","DontKaleMyVibe","SpruceItUp!","AloeThere","KeanuLeaves","TheBeetles","BestFronds","FlyCactiFly","PeasOnEarth","HostaLaVista","Soilmates","PricklyPear","MeSoThorny","ElvisParsley","Ferntasic24","JoeTheFungi","LetTheBeetDrop","Aloe-Ha","CarrotsAreCool","ImaBigDill","HarryPotPlant","KaleYeah!","SimplyRadishing","Sprout&Proud","One In a Melon!","BeetIt!BeetIt!","PeaBerryPeaHappy"];
+  var randomName = names[Math.floor(Math.random() * names.length)];
+  return randomName;
 }
