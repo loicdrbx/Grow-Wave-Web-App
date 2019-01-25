@@ -3926,11 +3926,13 @@ html, body {
 
 #gw-menu-dialog
 .mdc-dialog__surface {
-  max-width: 250px; }
+  width: 300px;
+  max-height: 350px; }
 
 #gw-add-unit-dialog
 .mdc-dialog__surface {
-  max-width: 250px; }
+  width: 300px;
+  max-height: 350px; }
 
 .gw-units-bar {
   background-color: #3E4451;

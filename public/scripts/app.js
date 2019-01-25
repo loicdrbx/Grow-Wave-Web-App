@@ -539,7 +539,7 @@ document.querySelectorAll('.updatable-button').forEach(function(button) {
 // Makes HTTP request to cloud functions to update Grow Wave device configuration
 function updateDeviceConfig(data) {
   // Device ID and function url required for request
-  data["deviceId"] = userUnits[userDefaultUnit];
+  data["deviceId"] = userDefaultUnit;
   const url = 'https://us-central1-grow-wave.cloudfunctions.net/updateDeviceConfig';
   // Call to fetch API to make request
   fetch(url, {
