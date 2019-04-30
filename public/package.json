@@ -4,7 +4,7 @@
   "description": "A web app that enables users to control their Grow Wave Hydroponics units wirelessly.",
   "scripts": {
     "test": "webpack-dev-server --progress",
-    "start": "webpack"
+    "compile": "webpack"
   },
   "author": "Loïc Darboux",
   "devDependencies": {

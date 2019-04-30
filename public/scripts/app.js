@@ -225,7 +225,9 @@ function populateSelect() {
     i++;
   });
   // Select user's default unit
-  select.selectedIndex = Object.keys(userUnits).indexOf(userDefaultUnit);
+  console.log(Object.keys(userUnits).indexOf(userDefaultUnit));
+  console.log(Object.keys(userUnits));
+  select.selectedIndex = 0;
   select.focus(); // successive focus and blur
   select.blur();  // to fix UI glitch
 }
