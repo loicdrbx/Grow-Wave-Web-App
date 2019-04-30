@@ -1,41 +1,58 @@
-# Grow Wave Web App [Almost Complete]
+# Grow Wave Web App 
 
 This repository contains all the magic associated with running Grow Wave's Web App.
 
 ## Prerequisites
 
-1. Download and install Node.js and npm [here](https://nodejs.org/en/)
-2. Firebase CLI
-2. Install and initialise the Google Cloud SDK by following the instructions [here](https://cloud.google.com/sdk/docs/quickstart-windows).
+1. Install Node.js (bundled with npm) from [here](https://nodejs.org/en/).
+2. Install the Firebase Command Line Interface from [here](https://firebase.google.com/docs/cli#install_the_firebase_cli) and log in to the Grow Wave  Google account.
+
 
 Note: the Google account associated with the Grow Wave project is *chrisfalconi@growwave.ca*.
 
 ## Installation
 
-1. Download this repository and navigate into it using a terminal.
-2. Install the  Firebase Command Line Interface by following the instructions [here](https://codelabs.developers.google.com/codelabs/firestore-web/#3).
-3. Install project dependecies by running ```npm install```.
+1. Clone this repository by running the following commands:
 
-## Updating the Web App
+   ```git clone https://gitlab.com/grow-wave/web-app```
 
-1. Modify the neccessary html, scss, and js files (bundle.css and bundle.js are auto-generated, do not touch them). 
-2. Run ```npm start``` in the public directory to compile the modified code.
-3. Run ```firebase deploy --only hosting``` to update the app online.
+   ```cd web-app```
+
+2. Install the dependecies required for the app by running the following commands:
+
+   ```cd public```
+
+   ```npm installl```
+
+## Updating the App
+
+All the files related to the App's behavior are located in the ```public``` folder.
+
+Modify ```.html```, ```.scss```, and ```.js``` files as needed. (```bundle.css``` and ```bundle.js``` are auto-generated, do not touch them). 
+
+Run ```npm test``` in the ```public``` directory in order to view your changes in a realtime, local server.
+
+When you are ready to deploy the app online, run ```npm compile``` to compile the code  for deployment.
+
+In the root directory, run ```firebase deploy --only hosting``` to publish the app to the internet.
 
 
 ## Updating the Cloud the Functions
 
-1. In the functions directory, modify ```index.js```
-2. Run ```firebase deploy --only functions```.
+All the files related the the app's Cloud Functions are located in the ```functions``` folder.
+
+Modify ```index.js``` as needed tp updated the cloud functions.
+
+In the root directory, run ```firebase deploy --only functions``` to publish the functions online.
 
 ## Monitoring Accounts/Units with Firebase
 
-1. Log in to the [firebase console] (https://console.firebase.google.com) with the Grow Wave Google Account
-2. Click on the Database tab to observe the database in realtime
-3. Click on the accounts tab to view and manage the accounts that have been created on the Web App.
-4. Click on function, then logs to view the activity logs from all the units and functions.
+1. Log in to the [firebase console](https://console.firebase.google.com) with the Grow Wave Google account.
+2. Click on the Database tab to observe the database in realtime.
+3. Click on the Authentification tab to view and manage the users that have created an account.
+4. Click on the Functions tab, then logs to view the activity logs from all Grow Wave units.
 
-Pro Tip: use tha account ID in the accounts tab to identify which units belong to whom.
+Pro Tip: use the user ID in the Authentification tab to identify which units belong to whom in the Database tab.
 
 ## To-Do 
 1. WRITE STRONGER SECURITY RULES FOR THE DATABASE.
@@ -43,4 +60,4 @@ Pro Tip: use tha account ID in the accounts tab to identify which units belong t
 
 ## Useful Resources
 
-1. The Grow Wave's google account contains instruction manuals and ither documents.
+1. The Grow Wave's Google account contains instruction manuals and other documents.
