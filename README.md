@@ -7,9 +7,6 @@ This repository contains all the magic associated with running Grow Wave's Web A
 1. Install Node.js (bundled with npm) from [here](https://nodejs.org/en/).
 2. Install the Firebase Command Line Interface from [here](https://firebase.google.com/docs/cli#install_the_firebase_cli) and log in to the Grow Wave  Google account.
 
-
-Note: the Google account associated with the Grow Wave project is *chrisfalconi@growwave.ca*.
-
 ## Installation
 
 1. Clone this repository by running the following commands:
