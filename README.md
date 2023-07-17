@@ -1,6 +1,9 @@
+*No longer maintained. For demonstration purposes only.*
+
 # Grow Wave Web App 
 
 This repository contains all the magic associated with running Grow Wave's Web App.
+
 
 ## Prerequisites
 
