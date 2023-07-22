@@ -22,7 +22,7 @@ This repository contains all the magic associated with running Grow Wave's Web A
 
    ```cd public```
 
-   ```npm installl```
+   ```npm install```
 
 ## Updating the App
 
